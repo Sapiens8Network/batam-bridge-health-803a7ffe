@@ -8,7 +8,7 @@ import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/hub/StateBloc
 import { HospitalShell, PageHeader } from "@/components/layout/HospitalShell";
 import { Button } from "@/components/ui/button";
 import { inquiriesQuery, referenceQuery } from "@/lib/api/queries";
-import { reviewStateMeta } from "@/lib/status";
+import { reviewMeta } from "@/lib/status";
 
 export const Route = createFileRoute("/doctors")({
   head: () => ({
@@ -59,8 +59,8 @@ function DoctorsPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Pill tone={reviewStateMeta[v.inquiry.doctorReview.state].tone}>
-                        {reviewStateMeta[v.inquiry.doctorReview.state].label}
+                      <Pill tone={reviewMeta[v.inquiry.doctorReview.state].tone}>
+                        {reviewMeta[v.inquiry.doctorReview.state].label}
                       </Pill>
                       <Button asChild variant="outline" size="sm">
                         <Link to="/inquiries/$id" params={{ id: v.inquiry.id }}>

@@ -6,7 +6,9 @@ import { Field, Pill } from "@/components/hub/Pill";
 import { ErrorBlock, LoadingBlock } from "@/components/hub/StateBlocks";
 import { HospitalShell, PageHeader } from "@/components/layout/HospitalShell";
 import { referenceQuery } from "@/lib/api/queries";
-import { duration, sgd } from "@/lib/format";
+import { sgd } from "@/lib/format";
+
+const mins = (m: number) => (m < 60 ? `${m} min` : `${(m / 60).toFixed(1)} h`);
 
 export const Route = createFileRoute("/logistics")({
   head: () => ({
@@ -49,7 +51,7 @@ function LogisticsPage() {
                 </div>
                 <dl className="mt-3 grid grid-cols-3 gap-3">
                   <Field label="Route" value={t.route} />
-                  <Field label="Duration" value={duration(t.durationMinutes)} />
+                  <Field label="Duration" value={mins(t.durationMinutes)} />
                   <Field label="Price" value={sgd(t.price)} />
                 </dl>
               </div>

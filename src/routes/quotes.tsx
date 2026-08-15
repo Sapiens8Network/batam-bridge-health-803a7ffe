@@ -11,7 +11,6 @@ import { HospitalShell, PageHeader } from "@/components/layout/HospitalShell";
 import { Button } from "@/components/ui/button";
 import { inquiriesQuery } from "@/lib/api/queries";
 import { sgd, relative } from "@/lib/format";
-import { quoteStatusMeta } from "@/lib/status";
 import { quoteTotals } from "@/lib/quote-math";
 import { cn } from "@/lib/utils";
 
@@ -30,6 +29,14 @@ export const Route = createFileRoute("/quotes")({
   }),
   component: QuotesPage,
 });
+
+const quoteStatusMeta = {
+  AI_ESTIMATE: { label: "AI estimate", tone: "info" },
+  HOSPITAL_ADJUSTED: { label: "Hospital adjusted", tone: "warning" },
+  APPROVED: { label: "Approved", tone: "batam" },
+  SENT_TO_PATIENT: { label: "Sent to patient", tone: "success" },
+  REJECTED: { label: "Rejected", tone: "danger" },
+} as const;
 
 function QuotesPage() {
   const { data, isPending, isError, refetch } = useQuery(inquiriesQuery());

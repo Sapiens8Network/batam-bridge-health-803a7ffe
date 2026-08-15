@@ -7,7 +7,9 @@ import { ErrorBlock, LoadingBlock } from "@/components/hub/StateBlocks";
 import { HospitalShell, PageHeader } from "@/components/layout/HospitalShell";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { referenceQuery } from "@/lib/api/queries";
-import { duration, pct, sgd } from "@/lib/format";
+import { pct, sgd } from "@/lib/format";
+
+const mins = (m: number) => (m < 60 ? `${m} min` : `${(m / 60).toFixed(1)} h`);
 
 export const Route = createFileRoute("/treatments")({
   head: () => ({
@@ -65,7 +67,7 @@ function TreatmentsPage() {
                           {sgd(savings)} · {pct((savings / t.singaporeBenchmark) * 100)}
                         </Pill>
                       </TableCell>
-                      <TableCell className="text-sm">{duration(t.durationMinutes)}</TableCell>
+                      <TableCell className="text-sm">{mins(t.durationMinutes)}</TableCell>
                       <TableCell className="text-sm tabular-nums">{t.stayNights}</TableCell>
                     </TableRow>
                   );
