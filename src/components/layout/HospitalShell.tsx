@@ -60,7 +60,7 @@ function SidebarStatus() {
     <div className="space-y-2 border-t border-sidebar-border px-4 py-3">
       <div>
         <p className="text-[10px] font-semibold uppercase tracking-wide text-sidebar-foreground/60">Hospital</p>
-        <p className="truncate text-sm font-semibold text-sidebar-foreground">{hospital.name}</p>
+        <p className="truncate text-sm font-semibold text-sidebar-foreground">{hospital?.name ?? "Loading…"}</p>
       </div>
       <dl className="space-y-1">
         {rows.map((row) => (
@@ -120,7 +120,7 @@ function TopBar() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className="max-w-52 justify-between gap-2">
-            <span className="truncate">{hospital.name}</span>
+            <span className="truncate">{hospital?.name ?? "Loading…"}</span>
             <ChevronsUpDown className="size-3.5 opacity-60" />
           </Button>
         </DropdownMenuTrigger>
