@@ -10,33 +10,219 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AiActivityRouteImport } from './routes/ai-activity'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as DoctorsRouteImport } from './routes/doctors'
+import { Route as LogisticsRouteImport } from './routes/logistics'
+import { Route as MessagesRouteImport } from './routes/messages'
+import { Route as QuotesRouteImport } from './routes/quotes'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as TreatmentsRouteImport } from './routes/treatments'
+import { Route as InquiriesIndexRouteImport } from './routes/inquiries.index'
+import { Route as InquiriesIdRouteImport } from './routes/inquiries.$id'
+import { Route as ItineraryTokenRouteImport } from './routes/itinerary.$token'
+import { Route as PatientsIndexRouteImport } from './routes/patients.index'
+import { Route as PatientsIdRouteImport } from './routes/patients.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiActivityRoute = AiActivityRouteImport.update({
+  id: '/ai-activity',
+  path: '/ai-activity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DoctorsRoute = DoctorsRouteImport.update({
+  id: '/doctors',
+  path: '/doctors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LogisticsRoute = LogisticsRouteImport.update({
+  id: '/logistics',
+  path: '/logistics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessagesRoute = MessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuotesRoute = QuotesRouteImport.update({
+  id: '/quotes',
+  path: '/quotes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TreatmentsRoute = TreatmentsRouteImport.update({
+  id: '/treatments',
+  path: '/treatments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InquiriesIndexRoute = InquiriesIndexRouteImport.update({
+  id: '/inquiries/',
+  path: '/inquiries/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InquiriesIdRoute = InquiriesIdRouteImport.update({
+  id: '/inquiries/$id',
+  path: '/inquiries/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ItineraryTokenRoute = ItineraryTokenRouteImport.update({
+  id: '/itinerary/$token',
+  path: '/itinerary/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PatientsIndexRoute = PatientsIndexRouteImport.update({
+  id: '/patients/',
+  path: '/patients/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PatientsIdRoute = PatientsIdRouteImport.update({
+  id: '/patients/$id',
+  path: '/patients/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai-activity': typeof AiActivityRoute
+  '/analytics': typeof AnalyticsRoute
+  '/dashboard': typeof DashboardRoute
+  '/doctors': typeof DoctorsRoute
+  '/logistics': typeof LogisticsRoute
+  '/messages': typeof MessagesRoute
+  '/quotes': typeof QuotesRoute
+  '/settings': typeof SettingsRoute
+  '/treatments': typeof TreatmentsRoute
+  '/inquiries/$id': typeof InquiriesIdRoute
+  '/itinerary/$token': typeof ItineraryTokenRoute
+  '/patients/$id': typeof PatientsIdRoute
+  '/inquiries/': typeof InquiriesIndexRoute
+  '/patients/': typeof PatientsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai-activity': typeof AiActivityRoute
+  '/analytics': typeof AnalyticsRoute
+  '/dashboard': typeof DashboardRoute
+  '/doctors': typeof DoctorsRoute
+  '/logistics': typeof LogisticsRoute
+  '/messages': typeof MessagesRoute
+  '/quotes': typeof QuotesRoute
+  '/settings': typeof SettingsRoute
+  '/treatments': typeof TreatmentsRoute
+  '/inquiries/$id': typeof InquiriesIdRoute
+  '/itinerary/$token': typeof ItineraryTokenRoute
+  '/patients/$id': typeof PatientsIdRoute
+  '/inquiries': typeof InquiriesIndexRoute
+  '/patients': typeof PatientsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai-activity': typeof AiActivityRoute
+  '/analytics': typeof AnalyticsRoute
+  '/dashboard': typeof DashboardRoute
+  '/doctors': typeof DoctorsRoute
+  '/logistics': typeof LogisticsRoute
+  '/messages': typeof MessagesRoute
+  '/quotes': typeof QuotesRoute
+  '/settings': typeof SettingsRoute
+  '/treatments': typeof TreatmentsRoute
+  '/inquiries/$id': typeof InquiriesIdRoute
+  '/itinerary/$token': typeof ItineraryTokenRoute
+  '/patients/$id': typeof PatientsIdRoute
+  '/inquiries/': typeof InquiriesIndexRoute
+  '/patients/': typeof PatientsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/ai-activity'
+    | '/analytics'
+    | '/dashboard'
+    | '/doctors'
+    | '/logistics'
+    | '/messages'
+    | '/quotes'
+    | '/settings'
+    | '/treatments'
+    | '/inquiries/$id'
+    | '/itinerary/$token'
+    | '/patients/$id'
+    | '/inquiries/'
+    | '/patients/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/ai-activity'
+    | '/analytics'
+    | '/dashboard'
+    | '/doctors'
+    | '/logistics'
+    | '/messages'
+    | '/quotes'
+    | '/settings'
+    | '/treatments'
+    | '/inquiries/$id'
+    | '/itinerary/$token'
+    | '/patients/$id'
+    | '/inquiries'
+    | '/patients'
+  id:
+    | '__root__'
+    | '/'
+    | '/ai-activity'
+    | '/analytics'
+    | '/dashboard'
+    | '/doctors'
+    | '/logistics'
+    | '/messages'
+    | '/quotes'
+    | '/settings'
+    | '/treatments'
+    | '/inquiries/$id'
+    | '/itinerary/$token'
+    | '/patients/$id'
+    | '/inquiries/'
+    | '/patients/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiActivityRoute: typeof AiActivityRoute
+  AnalyticsRoute: typeof AnalyticsRoute
+  DashboardRoute: typeof DashboardRoute
+  DoctorsRoute: typeof DoctorsRoute
+  LogisticsRoute: typeof LogisticsRoute
+  MessagesRoute: typeof MessagesRoute
+  QuotesRoute: typeof QuotesRoute
+  SettingsRoute: typeof SettingsRoute
+  TreatmentsRoute: typeof TreatmentsRoute
+  InquiriesIdRoute: typeof InquiriesIdRoute
+  ItineraryTokenRoute: typeof ItineraryTokenRoute
+  PatientsIdRoute: typeof PatientsIdRoute
+  InquiriesIndexRoute: typeof InquiriesIndexRoute
+  PatientsIndexRoute: typeof PatientsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +234,123 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-activity': {
+      id: '/ai-activity'
+      path: '/ai-activity'
+      fullPath: '/ai-activity'
+      preLoaderRoute: typeof AiActivityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/doctors': {
+      id: '/doctors'
+      path: '/doctors'
+      fullPath: '/doctors'
+      preLoaderRoute: typeof DoctorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/logistics': {
+      id: '/logistics'
+      path: '/logistics'
+      fullPath: '/logistics'
+      preLoaderRoute: typeof LogisticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/messages': {
+      id: '/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof MessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quotes': {
+      id: '/quotes'
+      path: '/quotes'
+      fullPath: '/quotes'
+      preLoaderRoute: typeof QuotesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/treatments': {
+      id: '/treatments'
+      path: '/treatments'
+      fullPath: '/treatments'
+      preLoaderRoute: typeof TreatmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inquiries/': {
+      id: '/inquiries/'
+      path: '/inquiries'
+      fullPath: '/inquiries/'
+      preLoaderRoute: typeof InquiriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inquiries/$id': {
+      id: '/inquiries/$id'
+      path: '/inquiries/$id'
+      fullPath: '/inquiries/$id'
+      preLoaderRoute: typeof InquiriesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/itinerary/$token': {
+      id: '/itinerary/$token'
+      path: '/itinerary/$token'
+      fullPath: '/itinerary/$token'
+      preLoaderRoute: typeof ItineraryTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/patients/': {
+      id: '/patients/'
+      path: '/patients'
+      fullPath: '/patients/'
+      preLoaderRoute: typeof PatientsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/patients/$id': {
+      id: '/patients/$id'
+      path: '/patients/$id'
+      fullPath: '/patients/$id'
+      preLoaderRoute: typeof PatientsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiActivityRoute: AiActivityRoute,
+  AnalyticsRoute: AnalyticsRoute,
+  DashboardRoute: DashboardRoute,
+  DoctorsRoute: DoctorsRoute,
+  LogisticsRoute: LogisticsRoute,
+  MessagesRoute: MessagesRoute,
+  QuotesRoute: QuotesRoute,
+  SettingsRoute: SettingsRoute,
+  TreatmentsRoute: TreatmentsRoute,
+  InquiriesIdRoute: InquiriesIdRoute,
+  ItineraryTokenRoute: ItineraryTokenRoute,
+  PatientsIdRoute: PatientsIdRoute,
+  InquiriesIndexRoute: InquiriesIndexRoute,
+  PatientsIndexRoute: PatientsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
