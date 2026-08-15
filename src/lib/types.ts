@@ -6,7 +6,7 @@
 
 export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
-export type Channel = "WHATSAPP" | "TELEGRAM";
+export type Channel = "WHATSAPP" | "TELEGRAM" | "WEB";
 
 export type InquiryStatus =
   | "NEW_INQUIRY"
