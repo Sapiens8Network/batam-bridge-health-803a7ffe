@@ -672,10 +672,20 @@ export async function updateSelections(
   const row = await loadSession(token);
   if ((row["stage"] as string) === "BOOKED") return toPayload(row, await planFor(row));
   const slots = slotsOf(row);
-  const next: ChatSelections = { ...selectionsOf(row, slots), ...patch };
+  const merged: ChatSelections = { ...selectionsOf(row, slots), ...patch };
+  const patients = Math.max(1, Math.min(20, Math.round(merged.patients)));
+  const companions = Math.max(0, Math.min(20, Math.round(merged.companions)));
+  const next: ChatSelections = {
+    ...merged,
+    patients,
+    companions,
+    travellers: patients + companions,
+  };
   const nextSlots: ChatSlots = {
     ...slots,
     treatmentId: next.treatmentId,
+    patients,
+    companions,
     travellers: next.travellers,
     nights: next.nights,
     date: next.date,
