@@ -11,14 +11,17 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AiActivityRouteImport } from './routes/ai-activity'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DoctorsRouteImport } from './routes/doctors'
 import { Route as LogisticsRouteImport } from './routes/logistics'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as QuotesRouteImport } from './routes/quotes'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as TreatmentsRouteImport } from './routes/treatments'
 import { Route as InquiriesIndexRouteImport } from './routes/inquiries.index'
 import { Route as InquiriesIdRouteImport } from './routes/inquiries.$id'
+import { Route as ItineraryTokenRouteImport } from './routes/itinerary.$token'
 import { Route as PatientsIndexRouteImport } from './routes/patients.index'
 import { Route as PatientsIdRouteImport } from './routes/patients.$id'
 
@@ -30,6 +33,11 @@ const IndexRoute = IndexRouteImport.update({
 const AiActivityRoute = AiActivityRouteImport.update({
   id: '/ai-activity',
   path: '/ai-activity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -57,6 +65,11 @@ const QuotesRoute = QuotesRouteImport.update({
   path: '/quotes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TreatmentsRoute = TreatmentsRouteImport.update({
   id: '/treatments',
   path: '/treatments',
@@ -70,6 +83,11 @@ const InquiriesIndexRoute = InquiriesIndexRouteImport.update({
 const InquiriesIdRoute = InquiriesIdRouteImport.update({
   id: '/inquiries/$id',
   path: '/inquiries/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ItineraryTokenRoute = ItineraryTokenRouteImport.update({
+  id: '/itinerary/$token',
+  path: '/itinerary/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PatientsIndexRoute = PatientsIndexRouteImport.update({
@@ -86,13 +104,16 @@ const PatientsIdRoute = PatientsIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ai-activity': typeof AiActivityRoute
+  '/analytics': typeof AnalyticsRoute
   '/dashboard': typeof DashboardRoute
   '/doctors': typeof DoctorsRoute
   '/logistics': typeof LogisticsRoute
   '/messages': typeof MessagesRoute
   '/quotes': typeof QuotesRoute
+  '/settings': typeof SettingsRoute
   '/treatments': typeof TreatmentsRoute
   '/inquiries/$id': typeof InquiriesIdRoute
+  '/itinerary/$token': typeof ItineraryTokenRoute
   '/patients/$id': typeof PatientsIdRoute
   '/inquiries/': typeof InquiriesIndexRoute
   '/patients/': typeof PatientsIndexRoute
@@ -100,13 +121,16 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ai-activity': typeof AiActivityRoute
+  '/analytics': typeof AnalyticsRoute
   '/dashboard': typeof DashboardRoute
   '/doctors': typeof DoctorsRoute
   '/logistics': typeof LogisticsRoute
   '/messages': typeof MessagesRoute
   '/quotes': typeof QuotesRoute
+  '/settings': typeof SettingsRoute
   '/treatments': typeof TreatmentsRoute
   '/inquiries/$id': typeof InquiriesIdRoute
+  '/itinerary/$token': typeof ItineraryTokenRoute
   '/patients/$id': typeof PatientsIdRoute
   '/inquiries': typeof InquiriesIndexRoute
   '/patients': typeof PatientsIndexRoute
@@ -115,13 +139,16 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/ai-activity': typeof AiActivityRoute
+  '/analytics': typeof AnalyticsRoute
   '/dashboard': typeof DashboardRoute
   '/doctors': typeof DoctorsRoute
   '/logistics': typeof LogisticsRoute
   '/messages': typeof MessagesRoute
   '/quotes': typeof QuotesRoute
+  '/settings': typeof SettingsRoute
   '/treatments': typeof TreatmentsRoute
   '/inquiries/$id': typeof InquiriesIdRoute
+  '/itinerary/$token': typeof ItineraryTokenRoute
   '/patients/$id': typeof PatientsIdRoute
   '/inquiries/': typeof InquiriesIndexRoute
   '/patients/': typeof PatientsIndexRoute
@@ -131,13 +158,16 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/ai-activity'
+    | '/analytics'
     | '/dashboard'
     | '/doctors'
     | '/logistics'
     | '/messages'
     | '/quotes'
+    | '/settings'
     | '/treatments'
     | '/inquiries/$id'
+    | '/itinerary/$token'
     | '/patients/$id'
     | '/inquiries/'
     | '/patients/'
@@ -145,13 +175,16 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/ai-activity'
+    | '/analytics'
     | '/dashboard'
     | '/doctors'
     | '/logistics'
     | '/messages'
     | '/quotes'
+    | '/settings'
     | '/treatments'
     | '/inquiries/$id'
+    | '/itinerary/$token'
     | '/patients/$id'
     | '/inquiries'
     | '/patients'
@@ -159,13 +192,16 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/ai-activity'
+    | '/analytics'
     | '/dashboard'
     | '/doctors'
     | '/logistics'
     | '/messages'
     | '/quotes'
+    | '/settings'
     | '/treatments'
     | '/inquiries/$id'
+    | '/itinerary/$token'
     | '/patients/$id'
     | '/inquiries/'
     | '/patients/'
@@ -174,13 +210,16 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AiActivityRoute: typeof AiActivityRoute
+  AnalyticsRoute: typeof AnalyticsRoute
   DashboardRoute: typeof DashboardRoute
   DoctorsRoute: typeof DoctorsRoute
   LogisticsRoute: typeof LogisticsRoute
   MessagesRoute: typeof MessagesRoute
   QuotesRoute: typeof QuotesRoute
+  SettingsRoute: typeof SettingsRoute
   TreatmentsRoute: typeof TreatmentsRoute
   InquiriesIdRoute: typeof InquiriesIdRoute
+  ItineraryTokenRoute: typeof ItineraryTokenRoute
   PatientsIdRoute: typeof PatientsIdRoute
   InquiriesIndexRoute: typeof InquiriesIndexRoute
   PatientsIndexRoute: typeof PatientsIndexRoute
@@ -200,6 +239,13 @@ declare module '@tanstack/react-router' {
       path: '/ai-activity'
       fullPath: '/ai-activity'
       preLoaderRoute: typeof AiActivityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -237,6 +283,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QuotesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/treatments': {
       id: '/treatments'
       path: '/treatments'
@@ -256,6 +309,13 @@ declare module '@tanstack/react-router' {
       path: '/inquiries/$id'
       fullPath: '/inquiries/$id'
       preLoaderRoute: typeof InquiriesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/itinerary/$token': {
+      id: '/itinerary/$token'
+      path: '/itinerary/$token'
+      fullPath: '/itinerary/$token'
+      preLoaderRoute: typeof ItineraryTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/patients/': {
@@ -278,13 +338,16 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AiActivityRoute: AiActivityRoute,
+  AnalyticsRoute: AnalyticsRoute,
   DashboardRoute: DashboardRoute,
   DoctorsRoute: DoctorsRoute,
   LogisticsRoute: LogisticsRoute,
   MessagesRoute: MessagesRoute,
   QuotesRoute: QuotesRoute,
+  SettingsRoute: SettingsRoute,
   TreatmentsRoute: TreatmentsRoute,
   InquiriesIdRoute: InquiriesIdRoute,
+  ItineraryTokenRoute: ItineraryTokenRoute,
   PatientsIdRoute: PatientsIdRoute,
   InquiriesIndexRoute: InquiriesIndexRoute,
   PatientsIndexRoute: PatientsIndexRoute,
