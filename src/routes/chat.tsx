@@ -104,6 +104,21 @@ function ChatPage() {
     onSuccess: setSession,
   });
 
+  const reset = useMutation({
+    mutationFn: async () => {
+      window.localStorage.removeItem(STORAGE_KEY);
+      return startFn({ data: {} });
+    },
+    onSuccess: (payload) => {
+      window.localStorage.setItem(STORAGE_KEY, payload.token);
+      setSession(payload);
+      setDraft("");
+      setName("");
+      setPhone("");
+    },
+  });
+
+
   const submit = (text: string) => {
     const value = text.trim();
     if (!value || send.isPending) return;
