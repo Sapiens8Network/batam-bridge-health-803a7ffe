@@ -647,3 +647,36 @@ export const sendStaffMessage = createServerFn({ method: "POST" })
     await audit({ requestId: data.inquiryId || null, entity: "messages", action: "REPLY_SENT" });
     return { ok: true };
   });
+
+/* --------------------------------------------------- website chat channel -- */
+
+export type WebChatPayload = import("./server/webchat.server").ChatSessionPayload;
+export type WebChatSelections = import("./server/webchat.server").ChatSelections;
+
+export const webChatSession = createServerFn({ method: "POST" })
+  .inputValidator((data: { token?: string | undefined }) => data)
+  .handler(async ({ data }): Promise<WebChatPayload> => {
+    const { getSession } = await import("./server/webchat.server");
+    return getSession(data.token ?? null);
+  });
+
+export const webChatMessage = createServerFn({ method: "POST" })
+  .inputValidator((data: { token?: string | undefined; text: string }) => data)
+  .handler(async ({ data }): Promise<WebChatPayload> => {
+    const { handleVisitorMessage } = await import("./server/webchat.server");
+    return handleVisitorMessage(data.token ?? null, data.text.slice(0, 1000));
+  });
+
+export const webChatSelect = createServerFn({ method: "POST" })
+  .inputValidator((data: { token: string; patch: Partial<WebChatSelections> }) => data)
+  .handler(async ({ data }): Promise<WebChatPayload> => {
+    const { updateSelections } = await import("./server/webchat.server");
+    return updateSelections(data.token, data.patch);
+  });
+
+export const webChatBook = createServerFn({ method: "POST" })
+  .inputValidator((data: { token: string; name: string; phone?: string | undefined }) => data)
+  .handler(async ({ data }): Promise<WebChatPayload> => {
+    const { bookFromChat } = await import("./server/webchat.server");
+    return bookFromChat(data.token, { name: data.name.slice(0, 120), phone: data.phone });
+  });
