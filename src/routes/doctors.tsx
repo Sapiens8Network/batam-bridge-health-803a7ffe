@@ -13,13 +13,13 @@ import { reviewMeta } from "@/lib/status";
 export const Route = createFileRoute("/doctors")({
   head: () => ({
     meta: [
-      { title: "Doctor Review Queue · Health Tourism Hub" },
+      { title: "Doctor Review Queue · MedBridge Pass" },
       {
         name: "description",
         content:
           "Batam specialists confirm proposed treatments, procedure duration and appointment slots before any quote reaches the patient.",
       },
-      { property: "og:title", content: "Doctor Review Queue · Health Tourism Hub" },
+      { property: "og:title", content: "Doctor Review Queue · MedBridge Pass" },
       { property: "og:description", content: "Clinical sign-off for cross-border medical travel cases." },
     ],
   }),

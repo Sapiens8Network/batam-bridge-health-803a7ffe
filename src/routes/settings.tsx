@@ -11,12 +11,12 @@ import { referenceQuery } from "@/lib/api/queries";
 export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
-      { title: "Hospital Settings · Health Tourism Hub" },
+      { title: "Hospital Settings · MedBridge Pass" },
       {
         name: "description",
         content: "Hospital profiles, messaging channel status and the orchestration pipeline that powers patient itineraries.",
       },
-      { property: "og:title", content: "Hospital Settings · Health Tourism Hub" },
+      { property: "og:title", content: "Hospital Settings · MedBridge Pass" },
       { property: "og:description", content: "Channel connections and workflow configuration for Batam facilities." },
     ],
   }),

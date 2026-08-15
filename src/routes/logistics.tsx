@@ -13,12 +13,12 @@ const mins = (m: number) => (m < 60 ? `${m} min` : `${(m / 60).toFixed(1)} h`);
 export const Route = createFileRoute("/logistics")({
   head: () => ({
     meta: [
-      { title: "Travel & Logistics · Health Tourism Hub" },
+      { title: "Travel & Logistics · MedBridge Pass" },
       {
         name: "description",
         content: "Ferry crossings, private transfers and recovery hotels used to assemble Singapore-to-Batam care journeys.",
       },
-      { property: "og:title", content: "Travel & Logistics · Health Tourism Hub" },
+      { property: "og:title", content: "Travel & Logistics · MedBridge Pass" },
       { property: "og:description", content: "Ferries, transfers and recovery stays for medical travellers." },
     ],
   }),

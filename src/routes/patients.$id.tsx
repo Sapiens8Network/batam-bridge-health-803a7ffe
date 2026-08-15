@@ -14,12 +14,12 @@ import { dateTime } from "@/lib/format";
 export const Route = createFileRoute("/patients/$id")({
   head: () => ({
     meta: [
-      { title: "Patient Record · Health Tourism Hub" },
+      { title: "Patient Record · MedBridge Pass" },
       {
         name: "description",
         content: "Patient profile with case history, communication channel and every Batam medical travel inquiry.",
       },
-      { property: "og:title", content: "Patient Record · Health Tourism Hub" },
+      { property: "og:title", content: "Patient Record · MedBridge Pass" },
       { property: "og:description", content: "Full case history for one cross-border patient." },
     ],
   }),

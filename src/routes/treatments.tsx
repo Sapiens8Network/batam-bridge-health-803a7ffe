@@ -14,13 +14,13 @@ const mins = (m: number) => (m < 60 ? `${m} min` : `${(m / 60).toFixed(1)} h`);
 export const Route = createFileRoute("/treatments")({
   head: () => ({
     meta: [
-      { title: "Treatment Catalogue · Health Tourism Hub" },
+      { title: "Treatment Catalogue · MedBridge Pass" },
       {
         name: "description",
         content:
           "Batam treatment catalogue with Singapore benchmark prices, expected savings, recovery nights and procedure duration.",
       },
-      { property: "og:title", content: "Treatment Catalogue · Health Tourism Hub" },
+      { property: "og:title", content: "Treatment Catalogue · MedBridge Pass" },
       { property: "og:description", content: "Compare Batam treatment pricing against Singapore benchmarks." },
     ],
   }),

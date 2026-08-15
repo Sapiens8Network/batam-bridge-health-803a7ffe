@@ -17,13 +17,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/quotes")({
   head: () => ({
     meta: [
-      { title: "Quote Builder · Health Tourism Hub" },
+      { title: "Quote Builder · MedBridge Pass" },
       {
         name: "description",
         content:
           "Review AI-estimated medical and travel costs, override line items and send hospital-approved quotes to Singapore patients.",
       },
-      { property: "og:title", content: "Quote Builder · Health Tourism Hub" },
+      { property: "og:title", content: "Quote Builder · MedBridge Pass" },
       { property: "og:description", content: "Adjust and approve cross-border treatment quotes." },
     ],
   }),

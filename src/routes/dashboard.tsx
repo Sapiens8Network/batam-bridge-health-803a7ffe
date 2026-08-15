@@ -26,13 +26,13 @@ import { useUi } from "@/lib/ui-store";
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Operations Dashboard · Health Tourism Hub" },
+      { title: "Operations Dashboard · MedBridge Pass" },
       {
         name: "description",
         content:
           "Live cross-border medical tourism operations: Singapore leads, AI itineraries, hospital reviews and confirmed Batam bookings.",
       },
-      { property: "og:title", content: "Operations Dashboard · Health Tourism Hub" },
+      { property: "og:title", content: "Operations Dashboard · MedBridge Pass" },
       {
         property: "og:description",
         content: "Track Singapore patient leads, AI-generated itineraries and hospital approvals in one place.",
