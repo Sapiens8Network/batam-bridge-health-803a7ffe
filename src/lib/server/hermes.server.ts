@@ -149,7 +149,7 @@ function keywordMatch(catalogue: { id: string; name: string; category: string; k
 }
 
 export interface InboundInput {
-  channel: "WHATSAPP" | "TELEGRAM";
+  channel: "WHATSAPP" | "TELEGRAM" | "WEB";
   message: string;
   name: string;
   externalId?: string | undefined;
@@ -444,7 +444,7 @@ async function createItineraryItems(
 export interface OutboundInput {
   patientId: string;
   requestId: string | null;
-  channel: "WHATSAPP" | "TELEGRAM";
+  channel: "WHATSAPP" | "TELEGRAM" | "WEB";
   author: "AI" | "HOSPITAL" | "SYSTEM";
   text: string;
 }
