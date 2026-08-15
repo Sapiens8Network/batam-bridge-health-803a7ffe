@@ -474,7 +474,8 @@ async function sendToPatient(ctx: any) {
     .select("patient_id,channel,ai_request")
     .eq("id", requestId)
     .maybeSingle();
-  const link = `${String(origin ?? "https://project--d711b2e9-8286-4b38-a76a-27e4f7a365a2.lovable.app")}/itinerary/${String(itinerary["public_token"])}`;
+  const baseUrl = origin ?? process.env["PUBLIC_APP_URL"] ?? "http://localhost:8080";
+  const link = `${String(baseUrl)}/itinerary/${String(itinerary["public_token"])}`;
   const treatment = ((request?.["ai_request"] ?? {}) as Record<string, unknown>)["treatment"] as string | undefined;
 
   await sb
