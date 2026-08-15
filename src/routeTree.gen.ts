@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AiActivityRouteImport } from './routes/ai-activity'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as InquiriesIndexRouteImport } from './routes/inquiries.index'
 import { Route as InquiriesIdRouteImport } from './routes/inquiries.$id'
 import { Route as PatientsIndexRouteImport } from './routes/patients.index'
@@ -21,9 +23,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiActivityRoute = AiActivityRouteImport.update({
+  id: '/ai-activity',
+  path: '/ai-activity',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessagesRoute = MessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InquiriesIndexRoute = InquiriesIndexRouteImport.update({
@@ -49,7 +61,9 @@ const PatientsIdRoute = PatientsIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai-activity': typeof AiActivityRoute
   '/dashboard': typeof DashboardRoute
+  '/messages': typeof MessagesRoute
   '/inquiries/$id': typeof InquiriesIdRoute
   '/patients/$id': typeof PatientsIdRoute
   '/inquiries/': typeof InquiriesIndexRoute
@@ -57,7 +71,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai-activity': typeof AiActivityRoute
   '/dashboard': typeof DashboardRoute
+  '/messages': typeof MessagesRoute
   '/inquiries/$id': typeof InquiriesIdRoute
   '/patients/$id': typeof PatientsIdRoute
   '/inquiries': typeof InquiriesIndexRoute
@@ -66,7 +82,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai-activity': typeof AiActivityRoute
   '/dashboard': typeof DashboardRoute
+  '/messages': typeof MessagesRoute
   '/inquiries/$id': typeof InquiriesIdRoute
   '/patients/$id': typeof PatientsIdRoute
   '/inquiries/': typeof InquiriesIndexRoute
@@ -76,7 +94,9 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/ai-activity'
     | '/dashboard'
+    | '/messages'
     | '/inquiries/$id'
     | '/patients/$id'
     | '/inquiries/'
@@ -84,7 +104,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ai-activity'
     | '/dashboard'
+    | '/messages'
     | '/inquiries/$id'
     | '/patients/$id'
     | '/inquiries'
@@ -92,7 +114,9 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/ai-activity'
     | '/dashboard'
+    | '/messages'
     | '/inquiries/$id'
     | '/patients/$id'
     | '/inquiries/'
@@ -101,7 +125,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiActivityRoute: typeof AiActivityRoute
   DashboardRoute: typeof DashboardRoute
+  MessagesRoute: typeof MessagesRoute
   InquiriesIdRoute: typeof InquiriesIdRoute
   PatientsIdRoute: typeof PatientsIdRoute
   InquiriesIndexRoute: typeof InquiriesIndexRoute
@@ -117,11 +143,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-activity': {
+      id: '/ai-activity'
+      path: '/ai-activity'
+      fullPath: '/ai-activity'
+      preLoaderRoute: typeof AiActivityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/messages': {
+      id: '/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof MessagesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inquiries/': {
@@ -157,7 +197,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiActivityRoute: AiActivityRoute,
   DashboardRoute: DashboardRoute,
+  MessagesRoute: MessagesRoute,
   InquiriesIdRoute: InquiriesIdRoute,
   PatientsIdRoute: PatientsIdRoute,
   InquiriesIndexRoute: InquiriesIndexRoute,
