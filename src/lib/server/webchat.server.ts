@@ -22,6 +22,8 @@ export interface ChatSlots {
   treatment: string | null;
   treatmentId: string | null;
   date: string | null;
+  patients: number | null;
+  companions: number | null;
   travellers: number | null;
   nights: number | null;
   notes: string | null;
@@ -34,6 +36,8 @@ export interface ChatSelections {
   hotelId: string | null;
   transportId: string | null;
   includeConcierge: boolean;
+  patients: number;
+  companions: number;
   travellers: number;
   nights: number;
   date: string | null;
