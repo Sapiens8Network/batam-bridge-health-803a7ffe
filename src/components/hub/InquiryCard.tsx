@@ -8,12 +8,19 @@ import { quoteTotals } from "@/lib/quote-math";
 import { inquiryStatusMeta, priorityMeta, reviewMeta } from "@/lib/status";
 import { cn } from "@/lib/utils";
 
-export function ChannelPill({ channel }: { channel: "WHATSAPP" | "TELEGRAM" }) {
-  const Icon = channel === "WHATSAPP" ? MessageSquare : Send;
+const channelMeta = {
+  WHATSAPP: { icon: MessageSquare, tone: "success", label: "WhatsApp" },
+  TELEGRAM: { icon: Send, tone: "info", label: "Telegram" },
+  WEB: { icon: Globe, tone: "batam", label: "Website chat" },
+} as const;
+
+export function ChannelPill({ channel }: { channel: Channel }) {
+  const meta = channelMeta[channel] ?? channelMeta.WEB;
+  const Icon = meta.icon;
   return (
-    <Pill tone={channel === "WHATSAPP" ? "success" : "info"}>
+    <Pill tone={meta.tone}>
       <Icon className="size-3" />
-      {channel === "WHATSAPP" ? "WhatsApp" : "Telegram"}
+      {meta.label}
     </Pill>
   );
 }
