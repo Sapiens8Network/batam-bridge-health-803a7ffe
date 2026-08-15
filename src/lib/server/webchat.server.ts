@@ -393,7 +393,7 @@ async function buildPlan(selections: ChatSelections): Promise<ChatPlan | null> {
         .map((f) => ({
           id: f["id"] as string,
           name: (f["operator_name"] as string) ?? "Ferry",
-          detail: `${String(f["origin_terminal"])} → ${String(f["destination_terminal"])} · ${String(f["departure_time"] ?? "")}`.trim(),
+          detail: `${String(f["origin_terminal"])} → ${String(f["destination_terminal"])} · ${String(f["estimated_duration_minutes"] ?? 0)} min`,
           price: n(f["estimated_cost_sgd"]),
         }))
         .filter((o) => !!o.id),
