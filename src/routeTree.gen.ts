@@ -12,7 +12,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AiActivityRouteImport } from './routes/ai-activity'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as DoctorsRouteImport } from './routes/doctors'
+import { Route as LogisticsRouteImport } from './routes/logistics'
 import { Route as MessagesRouteImport } from './routes/messages'
+import { Route as QuotesRouteImport } from './routes/quotes'
+import { Route as TreatmentsRouteImport } from './routes/treatments'
 import { Route as InquiriesIndexRouteImport } from './routes/inquiries.index'
 import { Route as InquiriesIdRouteImport } from './routes/inquiries.$id'
 import { Route as PatientsIndexRouteImport } from './routes/patients.index'
@@ -33,9 +37,29 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DoctorsRoute = DoctorsRouteImport.update({
+  id: '/doctors',
+  path: '/doctors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LogisticsRoute = LogisticsRouteImport.update({
+  id: '/logistics',
+  path: '/logistics',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MessagesRoute = MessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuotesRoute = QuotesRouteImport.update({
+  id: '/quotes',
+  path: '/quotes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TreatmentsRoute = TreatmentsRouteImport.update({
+  id: '/treatments',
+  path: '/treatments',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InquiriesIndexRoute = InquiriesIndexRouteImport.update({
@@ -63,7 +87,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ai-activity': typeof AiActivityRoute
   '/dashboard': typeof DashboardRoute
+  '/doctors': typeof DoctorsRoute
+  '/logistics': typeof LogisticsRoute
   '/messages': typeof MessagesRoute
+  '/quotes': typeof QuotesRoute
+  '/treatments': typeof TreatmentsRoute
   '/inquiries/$id': typeof InquiriesIdRoute
   '/patients/$id': typeof PatientsIdRoute
   '/inquiries/': typeof InquiriesIndexRoute
@@ -73,7 +101,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ai-activity': typeof AiActivityRoute
   '/dashboard': typeof DashboardRoute
+  '/doctors': typeof DoctorsRoute
+  '/logistics': typeof LogisticsRoute
   '/messages': typeof MessagesRoute
+  '/quotes': typeof QuotesRoute
+  '/treatments': typeof TreatmentsRoute
   '/inquiries/$id': typeof InquiriesIdRoute
   '/patients/$id': typeof PatientsIdRoute
   '/inquiries': typeof InquiriesIndexRoute
@@ -84,7 +116,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/ai-activity': typeof AiActivityRoute
   '/dashboard': typeof DashboardRoute
+  '/doctors': typeof DoctorsRoute
+  '/logistics': typeof LogisticsRoute
   '/messages': typeof MessagesRoute
+  '/quotes': typeof QuotesRoute
+  '/treatments': typeof TreatmentsRoute
   '/inquiries/$id': typeof InquiriesIdRoute
   '/patients/$id': typeof PatientsIdRoute
   '/inquiries/': typeof InquiriesIndexRoute
@@ -96,7 +132,11 @@ export interface FileRouteTypes {
     | '/'
     | '/ai-activity'
     | '/dashboard'
+    | '/doctors'
+    | '/logistics'
     | '/messages'
+    | '/quotes'
+    | '/treatments'
     | '/inquiries/$id'
     | '/patients/$id'
     | '/inquiries/'
@@ -106,7 +146,11 @@ export interface FileRouteTypes {
     | '/'
     | '/ai-activity'
     | '/dashboard'
+    | '/doctors'
+    | '/logistics'
     | '/messages'
+    | '/quotes'
+    | '/treatments'
     | '/inquiries/$id'
     | '/patients/$id'
     | '/inquiries'
@@ -116,7 +160,11 @@ export interface FileRouteTypes {
     | '/'
     | '/ai-activity'
     | '/dashboard'
+    | '/doctors'
+    | '/logistics'
     | '/messages'
+    | '/quotes'
+    | '/treatments'
     | '/inquiries/$id'
     | '/patients/$id'
     | '/inquiries/'
@@ -127,7 +175,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AiActivityRoute: typeof AiActivityRoute
   DashboardRoute: typeof DashboardRoute
+  DoctorsRoute: typeof DoctorsRoute
+  LogisticsRoute: typeof LogisticsRoute
   MessagesRoute: typeof MessagesRoute
+  QuotesRoute: typeof QuotesRoute
+  TreatmentsRoute: typeof TreatmentsRoute
   InquiriesIdRoute: typeof InquiriesIdRoute
   PatientsIdRoute: typeof PatientsIdRoute
   InquiriesIndexRoute: typeof InquiriesIndexRoute
@@ -157,11 +209,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/doctors': {
+      id: '/doctors'
+      path: '/doctors'
+      fullPath: '/doctors'
+      preLoaderRoute: typeof DoctorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/logistics': {
+      id: '/logistics'
+      path: '/logistics'
+      fullPath: '/logistics'
+      preLoaderRoute: typeof LogisticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/messages': {
       id: '/messages'
       path: '/messages'
       fullPath: '/messages'
       preLoaderRoute: typeof MessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quotes': {
+      id: '/quotes'
+      path: '/quotes'
+      fullPath: '/quotes'
+      preLoaderRoute: typeof QuotesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/treatments': {
+      id: '/treatments'
+      path: '/treatments'
+      fullPath: '/treatments'
+      preLoaderRoute: typeof TreatmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inquiries/': {
@@ -199,7 +279,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AiActivityRoute: AiActivityRoute,
   DashboardRoute: DashboardRoute,
+  DoctorsRoute: DoctorsRoute,
+  LogisticsRoute: LogisticsRoute,
   MessagesRoute: MessagesRoute,
+  QuotesRoute: QuotesRoute,
+  TreatmentsRoute: TreatmentsRoute,
   InquiriesIdRoute: InquiriesIdRoute,
   PatientsIdRoute: PatientsIdRoute,
   InquiriesIndexRoute: InquiriesIndexRoute,
