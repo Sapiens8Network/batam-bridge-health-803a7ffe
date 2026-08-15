@@ -8,7 +8,7 @@ export function Pill({
   className,
 }: {
   tone?: Tone;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   dot?: boolean;
   className?: string;
 }) {
@@ -20,7 +20,7 @@ export function Pill({
         className,
       )}
     >
-      {dot ? <span className={cn("size-1.5 rounded-full", dotClass[tone])} /> : null}
+      {dot || !children ? <span className={cn("size-1.5 rounded-full", dotClass[tone])} /> : null}
       {children}
     </span>
   );
