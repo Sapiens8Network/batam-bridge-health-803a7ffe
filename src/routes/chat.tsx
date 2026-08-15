@@ -582,3 +582,50 @@ function OptionSwitcher({
   );
 }
 
+
+function Stepper({
+  label,
+  value,
+  min,
+  max = 20,
+  disabled,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max?: number;
+  disabled?: boolean;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <div className="flex items-center gap-1.5">
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="size-7"
+          disabled={disabled || value <= min}
+          aria-label={`Decrease ${label}`}
+          onClick={() => onChange(Math.max(min, value - 1))}
+        >
+          <Minus className="size-3.5" />
+        </Button>
+        <span className="w-6 text-center text-sm font-semibold">{value}</span>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="size-7"
+          disabled={disabled || value >= max}
+          aria-label={`Increase ${label}`}
+          onClick={() => onChange(Math.min(max, value + 1))}
+        >
+          <Plus className="size-3.5" />
+        </Button>
+      </div>
+    </div>
+  );
+}
