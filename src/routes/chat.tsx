@@ -466,33 +466,56 @@ function OptionSwitcher({
   activeId,
   onPick,
   suffix = "",
+  label = "Choose an option",
 }: {
   options: { id: string; name: string; detail: string; price: number }[];
   activeId: string | null;
   onPick: (id: string) => void;
   suffix?: string;
+  label?: string;
 }) {
   return (
-    <div className="mt-3 flex flex-wrap gap-2">
-      {options.map((option) => (
-        <button
-          key={option.id}
-          type="button"
-          onClick={() => onPick(option.id)}
-          className={cn(
-            "rounded-lg border px-2.5 py-1.5 text-left text-xs transition-colors",
-            option.id === activeId
-              ? "border-primary bg-primary/5 text-foreground"
-              : "text-muted-foreground hover:border-primary/50",
-          )}
-        >
-          <span className="block font-medium">{option.name}</span>
-          <span className="block text-[11px]">
-            {option.detail}
-            {option.price > 0 ? ` · ${sgd(option.price)}${suffix}` : ""}
-          </span>
-        </button>
-      ))}
+    <div className="mt-3 space-y-1.5">
+      <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
+      {options.map((option) => {
+        const active = option.id === activeId;
+        return (
+          <button
+            key={option.id}
+            type="button"
+            role="radio"
+            aria-checked={active}
+            onClick={() => onPick(option.id)}
+            className={cn(
+              "flex w-full items-start gap-2 rounded-lg border px-2.5 py-2 text-left text-xs transition-colors",
+              active
+                ? "border-primary bg-primary/5 text-foreground"
+                : "text-muted-foreground hover:border-primary/50",
+            )}
+          >
+            <span
+              className={cn(
+                "mt-0.5 grid size-4 shrink-0 place-items-center rounded-[4px] border",
+                active
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-muted-foreground/40",
+              )}
+            >
+              {active && <Check className="size-3" />}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-medium text-foreground">{option.name}</span>
+              <span className="block text-[11px]">
+                {option.detail}
+                {option.price > 0 ? ` · ${sgd(option.price)}${suffix}` : ""}
+              </span>
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }
+
