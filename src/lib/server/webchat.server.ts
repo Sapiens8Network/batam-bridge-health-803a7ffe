@@ -595,11 +595,18 @@ export async function handleVisitorMessage(
     text,
   );
   const guess = fallback(catalogue, slots, text);
+  const mergedPatients = ai?.patients ?? guess.patients ?? slots.patients;
+  const mergedCompanions = ai?.companions ?? guess.companions ?? slots.companions;
   const merged: ChatSlots = {
     treatment: ai?.treatment ?? guess.treatment ?? slots.treatment,
     treatmentId: slots.treatmentId,
     date: ai?.date ?? guess.date ?? slots.date,
-    travellers: ai?.travellers ?? guess.travellers ?? slots.travellers,
+    patients: mergedPatients,
+    companions: mergedCompanions,
+    travellers:
+      mergedPatients !== null && mergedCompanions !== null
+        ? mergedPatients + mergedCompanions
+        : slots.travellers,
     nights: ai?.nights ?? guess.nights ?? slots.nights,
     notes: ai?.notes ?? slots.notes,
   };
@@ -610,7 +617,11 @@ export async function handleVisitorMessage(
   if (matchedTreatment) merged.treatment = matchedTreatment["name"] as string;
 
   const complete =
-    !!merged.treatmentId && !!merged.date && merged.travellers !== null && merged.nights !== null;
+    !!merged.treatmentId &&
+    !!merged.date &&
+    merged.patients !== null &&
+    merged.companions !== null &&
+    merged.nights !== null;
   const reply = complete
     ? (ai?.reply ??
       "Perfect — your trip plan is ready below. Untick anything you don't need, or swap the hotel and ferry.")
@@ -623,10 +634,14 @@ export async function handleVisitorMessage(
     { role: "AGENT", text: reply, at: now },
   ];
 
+  const patients = Math.max(1, merged.patients ?? 1);
+  const companions = Math.max(0, merged.companions ?? 0);
   const selections: ChatSelections = {
     ...selectionsOf(row, merged),
     treatmentId: merged.treatmentId,
-    travellers: merged.travellers ?? 1,
+    patients,
+    companions,
+    travellers: patients + companions,
     nights: merged.nights ?? 0,
     date: merged.date,
   };
