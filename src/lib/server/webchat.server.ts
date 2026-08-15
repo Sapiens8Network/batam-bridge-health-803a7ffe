@@ -437,14 +437,14 @@ async function buildPlan(selections: ChatSelections): Promise<ChatPlan | null> {
           breakdown.diagnostics +
           breakdown.medication,
       );
-      const perTraveller = n(medicalTotal / travellers);
+      const perPatient = n(medicalTotal / patients);
       const money = (v: number) =>
         `$${v.toLocaleString("en-SG", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
       return [
         {
           key: "treatment",
           label: `${treatment["name"] as string} at ${(hospital?.["name"] as string) ?? "Batam hospital"}`,
-          detail: `${money(perTraveller)} per patient (treatment, doctor, hospital, diagnostics, medication) × ${travellers} traveller(s)`,
+          detail: `${money(perPatient)} per patient (treatment, doctor, hospital, diagnostics, medication) × ${patients} patient(s) — companions are not charged`,
           price: medicalTotal,
           optional: false,
           selected: true,
@@ -455,7 +455,7 @@ async function buildPlan(selections: ChatSelections): Promise<ChatPlan | null> {
             ? `Return ferry · ${String(ferry["operator_name"] ?? "Scheduled ferry")}`
             : "Return ferry",
           detail: ferry
-            ? `${String(ferry["origin_terminal"])} → ${String(ferry["destination_terminal"])} · ${money(n(ferry["estimated_cost_sgd"]))}/way × ${travellers} traveller(s) × 2 ways`
+            ? `${String(ferry["origin_terminal"])} → ${String(ferry["destination_terminal"])} · ${money(n(ferry["estimated_cost_sgd"]))}/way × ${travellers} traveller(s) (${patients} patient(s) + ${companions} companion(s)) × 2 ways`
             : "No ferry configured",
           price: breakdown.ferry,
           optional: true,
