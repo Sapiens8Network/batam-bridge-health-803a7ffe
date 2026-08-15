@@ -258,8 +258,8 @@ function buildSeed(input: {
   const patient = patients.find((p) => p.id === input.patientId)!;
   const hospital = hospitals.find((h) => h.id === input.hospitalId)!;
   const doctor = doctors.find((d) => d.id === input.doctorId)!;
-  const hotel = hotels.find((h) => h.area.startsWith(hospital.city.split(",")[0].trim())) ?? hotels[0];
-  const ferry = transportOptions[0];
+  const hotel = hotels.find((h) => h.area.startsWith((hospital.city.split(",")[0] ?? "").trim())) ?? hotels[0]!;
+  const ferry = transportOptions[0]!;
   const inquiryId = `inq_${String(input.idx).padStart(3, "0")}`;
   const quoteId = `qte_${String(input.idx).padStart(3, "0")}`;
   const itineraryId = `itn_${String(input.idx).padStart(3, "0")}`;
@@ -297,7 +297,7 @@ function buildSeed(input: {
 
   const itinerary: Itinerary = {
     id: itineraryId,
-    token: `tkn-${input.idx}${patient.name.split(" ")[0].toLowerCase()}-4f8a2c`,
+    token: `tkn-${input.idx}${(patient.name.split(" ")[0] ?? "p").toLowerCase()}-4f8a2c`,
     inquiryId,
     hospitalId: hospital.id,
     status: confirmed ? "HOSPITAL_CONFIRMED" : "DRAFT",
@@ -452,7 +452,7 @@ function buildSeed(input: {
       specialRequirements:
         input.idx === 3
           ? ["Elderly patient", "Hypertension mentioned by family", "Requests travel suitability advice"]
-          : input.travellersNote ?? ["English-speaking coordinator requested"],
+          : ["English-speaking coordinator requested"],
     },
     hospitalReview: input.hospitalReview,
     doctorReview: {
