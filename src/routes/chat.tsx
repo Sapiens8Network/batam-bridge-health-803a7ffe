@@ -348,6 +348,7 @@ function ChatPage() {
 
                     {line.key === "hotel" && line.selected && plan.options.hotels.length > 1 && (
                       <OptionSwitcher
+                        label="Choose your hotel"
                         options={plan.options.hotels}
                         activeId={selections?.hotelId ?? plan.options.hotels[0]?.id ?? null}
                         onPick={(id) => select.mutate({ hotelId: id })}
@@ -356,6 +357,7 @@ function ChatPage() {
                     )}
                     {line.key === "ferry" && line.selected && plan.options.ferries.length > 1 && (
                       <OptionSwitcher
+                        label="Choose your ferry"
                         options={plan.options.ferries}
                         activeId={selections?.ferryId ?? plan.options.ferries[0]?.id ?? null}
                         onPick={(id) => select.mutate({ ferryId: id })}
@@ -364,17 +366,40 @@ function ChatPage() {
                     )}
                     {line.key === "treatment" && plan.options.hospitals.length > 1 && (
                       <OptionSwitcher
+                        label="Choose your hospital (base treatment price per patient)"
                         options={plan.options.hospitals}
                         activeId={selections?.hospitalId ?? plan.hospital.id}
                         onPick={(id) => select.mutate({ hospitalId: id })}
                       />
                     )}
+                    {line.key === "transport" &&
+                      line.selected &&
+                      plan.options.transports.length > 1 && (
+                        <OptionSwitcher
+                          label="Choose your transfer"
+                          options={plan.options.transports}
+                          activeId={
+                            selections?.transportId ?? plan.options.transports[0]?.id ?? null
+                          }
+                          onPick={(id) => select.mutate({ transportId: id })}
+                        />
+                      )}
                   </div>
                 ))}
               </div>
 
               <div className="rounded-xl bg-muted/60 p-4">
-                <div className="flex items-baseline justify-between">
+                <ul className="space-y-1 border-b pb-3 text-xs">
+                  {plan.lines
+                    .filter((l) => l.selected)
+                    .map((l) => (
+                      <li key={l.key} className="flex items-baseline justify-between gap-3">
+                        <span className="truncate text-muted-foreground">{l.label}</span>
+                        <span className="shrink-0 font-medium">{sgd(l.price)}</span>
+                      </li>
+                    ))}
+                </ul>
+                <div className="mt-3 flex items-baseline justify-between">
                   <span className="text-sm text-muted-foreground">Your total</span>
                   <span className="text-2xl font-semibold">{sgd(total)}</span>
                 </div>
@@ -388,6 +413,7 @@ function ChatPage() {
                   </p>
                 )}
               </div>
+
 
               {session?.stage === "BOOKED" ? (
                 <div className="space-y-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
@@ -466,33 +492,56 @@ function OptionSwitcher({
   activeId,
   onPick,
   suffix = "",
+  label = "Choose an option",
 }: {
   options: { id: string; name: string; detail: string; price: number }[];
   activeId: string | null;
   onPick: (id: string) => void;
   suffix?: string;
+  label?: string;
 }) {
   return (
-    <div className="mt-3 flex flex-wrap gap-2">
-      {options.map((option) => (
-        <button
-          key={option.id}
-          type="button"
-          onClick={() => onPick(option.id)}
-          className={cn(
-            "rounded-lg border px-2.5 py-1.5 text-left text-xs transition-colors",
-            option.id === activeId
-              ? "border-primary bg-primary/5 text-foreground"
-              : "text-muted-foreground hover:border-primary/50",
-          )}
-        >
-          <span className="block font-medium">{option.name}</span>
-          <span className="block text-[11px]">
-            {option.detail}
-            {option.price > 0 ? ` · ${sgd(option.price)}${suffix}` : ""}
-          </span>
-        </button>
-      ))}
+    <div className="mt-3 space-y-1.5">
+      <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
+      {options.map((option) => {
+        const active = option.id === activeId;
+        return (
+          <button
+            key={option.id}
+            type="button"
+            role="radio"
+            aria-checked={active}
+            onClick={() => onPick(option.id)}
+            className={cn(
+              "flex w-full items-start gap-2 rounded-lg border px-2.5 py-2 text-left text-xs transition-colors",
+              active
+                ? "border-primary bg-primary/5 text-foreground"
+                : "text-muted-foreground hover:border-primary/50",
+            )}
+          >
+            <span
+              className={cn(
+                "mt-0.5 grid size-4 shrink-0 place-items-center rounded-[4px] border",
+                active
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-muted-foreground/40",
+              )}
+            >
+              {active && <Check className="size-3" />}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-medium text-foreground">{option.name}</span>
+              <span className="block text-[11px]">
+                {option.detail}
+                {option.price > 0 ? ` · ${sgd(option.price)}${suffix}` : ""}
+              </span>
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }
+

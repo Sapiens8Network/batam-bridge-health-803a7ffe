@@ -392,65 +392,74 @@ async function buildPlan(selections: ChatSelections): Promise<ChatPlan | null> {
     benchmarkTotal: benchTotal,
     savings,
     savingsPct: benchTotal > 0 ? Math.round((savings / benchTotal) * 10000) / 100 : 0,
-    lines: [
-      {
-        key: "treatment",
-        label: `${treatment["name"] as string} at ${(hospital?.["name"] as string) ?? "Batam hospital"}`,
-        detail: `Consultation, procedure, diagnostics and medication · ${travellers} traveller(s)`,
-        price: n(
-          breakdown.treatment +
-            breakdown.doctorFee +
-            breakdown.hospitalFee +
-            breakdown.diagnostics +
-            breakdown.medication,
-        ),
-        optional: false,
-        selected: true,
-      },
-      {
-        key: "ferry",
-        label: ferry
-          ? `Return ferry · ${String(ferry["operator_name"] ?? "Scheduled ferry")}`
-          : "Return ferry",
-        detail: ferry
-          ? `${String(ferry["origin_terminal"])} → ${String(ferry["destination_terminal"])}`
-          : "No ferry configured",
-        price: breakdown.ferry,
-        optional: true,
-        selected: ferryIncluded,
-      },
-      {
-        key: "hotel",
-        label: hotel ? `Recovery hotel · ${String(hotel["name"])}` : "Recovery hotel",
-        detail:
-          nights > 0
-            ? `${nights} night(s)${hotel ? ` · ${String(hotel["location"])}` : ""}`
-            : "Day trip — no stay",
-        price: breakdown.hotel,
-        optional: true,
-        selected: hotelIncluded,
-      },
-      {
-        key: "transport",
-        label: transport
-          ? `Private transfers · ${String(transport["name"] ?? transport["type"])}`
-          : "Private transfers",
-        detail: transport
-          ? `${String(transport["origin"])} → ${String(transport["destination"])}, both ways`
-          : "No transfer configured",
-        price: breakdown.localTransport,
-        optional: true,
-        selected: transportIncluded,
-      },
-      {
-        key: "concierge",
-        label: "Care coordinator & translation",
-        detail: "English/Mandarin coordinator on the day of treatment",
-        price: breakdown.otherServices,
-        optional: true,
-        selected: selections.includeConcierge,
-      },
-    ],
+    lines: (() => {
+      const medicalTotal = n(
+        breakdown.treatment +
+          breakdown.doctorFee +
+          breakdown.hospitalFee +
+          breakdown.diagnostics +
+          breakdown.medication,
+      );
+      const perTraveller = n(medicalTotal / travellers);
+      const money = (v: number) =>
+        `$${v.toLocaleString("en-SG", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+      return [
+        {
+          key: "treatment",
+          label: `${treatment["name"] as string} at ${(hospital?.["name"] as string) ?? "Batam hospital"}`,
+          detail: `${money(perTraveller)} per patient (treatment, doctor, hospital, diagnostics, medication) × ${travellers} traveller(s)`,
+          price: medicalTotal,
+          optional: false,
+          selected: true,
+        },
+        {
+          key: "ferry",
+          label: ferry
+            ? `Return ferry · ${String(ferry["operator_name"] ?? "Scheduled ferry")}`
+            : "Return ferry",
+          detail: ferry
+            ? `${String(ferry["origin_terminal"])} → ${String(ferry["destination_terminal"])} · ${money(n(ferry["estimated_cost_sgd"]))}/way × ${travellers} traveller(s) × 2 ways`
+            : "No ferry configured",
+          price: breakdown.ferry,
+          optional: true,
+          selected: ferryIncluded,
+        },
+        {
+          key: "hotel",
+          label: hotel ? `Recovery hotel · ${String(hotel["name"])}` : "Recovery hotel",
+          detail:
+            nights > 0 && hotel
+              ? `${money(n(hotel["price_per_night_sgd"]))}/night × ${nights} night(s) · 1 room · ${String(hotel["location"])}`
+              : nights > 0
+                ? `${nights} night(s)`
+                : "Day trip — no stay",
+          price: breakdown.hotel,
+          optional: true,
+          selected: hotelIncluded,
+        },
+        {
+          key: "transport",
+          label: transport
+            ? `Private transfers · ${String(transport["name"] ?? transport["type"])}`
+            : "Private transfers",
+          detail: transport
+            ? `${String(transport["origin"])} → ${String(transport["destination"])} · ${money(n(transport["estimated_cost_sgd"]))} × 2 ways`
+            : "No transfer configured",
+          price: breakdown.localTransport,
+          optional: true,
+          selected: transportIncluded,
+        },
+        {
+          key: "concierge",
+          label: "Care coordinator & translation",
+          detail: "English/Mandarin coordinator on the day of treatment",
+          price: breakdown.otherServices,
+          optional: true,
+          selected: selections.includeConcierge,
+        },
+      ];
+    })(),
+
     options: {
       hospitals: hospitalRows
         .map((h) => {
