@@ -1,8 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { CalendarDays, MessageSquare, Send } from "lucide-react";
+import { CalendarDays, Globe, MessageSquare, Send } from "lucide-react";
 
 import { ConfidenceBar, Pill } from "@/components/hub/Pill";
 import type { InquiryView } from "@/lib/api";
+import type { Channel } from "@/lib/types";
 import { pct, relative, sgd } from "@/lib/format";
 import { quoteTotals } from "@/lib/quote-math";
 import { inquiryStatusMeta, priorityMeta, reviewMeta } from "@/lib/status";
