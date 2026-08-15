@@ -15,9 +15,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useHub } from "@/lib/mock/store";
-import { hubStatics } from "@/lib/mock/store";
-import { isMockMode } from "@/lib/api/client";
+import { useQuery } from "@tanstack/react-query";
+
+import { useUi } from "@/lib/ui-store";
+import { dashboardQuery, referenceQuery } from "@/lib/api/queries";
 import { cn } from "@/lib/utils";
 
 function NavList({ onNavigate }: { onNavigate?: () => void }) {
@@ -46,8 +47,10 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 function SidebarStatus() {
-  const { connections, activeHospitalId } = useHub();
-  const hospital = hubStatics.hospitals.find((h) => h.id === activeHospitalId) ?? hubStatics.hospitals[0]!;
+  const { connections, activeHospitalId } = useUi();
+  const { data: reference } = useQuery(referenceQuery());
+  const hospitals = reference?.hospitals ?? [];
+  const hospital = hospitals.find((h) => h.id === activeHospitalId) ?? hospitals[0];
   const rows = [
     { label: "AI Agent", value: connections.ai ? "ONLINE" : "OFFLINE", ok: connections.ai },
     { label: "WhatsApp", value: connections.whatsapp ? "CONNECTED" : "DISCONNECTED", ok: connections.whatsapp },
@@ -89,8 +92,12 @@ function Brand() {
 }
 
 function TopBar() {
-  const { connections, activeHospitalId, setActiveHospital, feed } = useHub();
-  const hospital = hubStatics.hospitals.find((h) => h.id === activeHospitalId) ?? hubStatics.hospitals[0]!;
+  const { connections, activeHospitalId, setActiveHospital } = useUi();
+  const { data: reference } = useQuery(referenceQuery());
+  const { data: dashboard } = useQuery(dashboardQuery());
+  const hospitals = reference?.hospitals ?? [];
+  const feed = dashboard?.feed ?? [];
+  const hospital = hospitals.find((h) => h.id === activeHospitalId) ?? hospitals[0];
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-card/90 px-3 backdrop-blur sm:px-4">
@@ -120,7 +127,7 @@ function TopBar() {
         <DropdownMenuContent align="start" className="w-64">
           <DropdownMenuLabel>Switch hospital</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {hubStatics.hospitals.map((h) => (
+          {hospitals.map((h) => (
             <DropdownMenuItem key={h.id} onClick={() => setActiveHospital(h.id)}>
               <span className="truncate">{h.name}</span>
             </DropdownMenuItem>
@@ -144,7 +151,6 @@ function TopBar() {
           <Pill tone={connections.telegram ? "info" : "danger"} dot>
             <Send className="size-3" /> Telegram
           </Pill>
-          {isMockMode ? <Pill tone="warning">Mock mode</Pill> : null}
         </span>
 
         <DropdownMenu>

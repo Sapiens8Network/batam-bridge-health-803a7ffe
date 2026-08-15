@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { dashboardQuery, inquiriesQuery } from "@/lib/api/queries";
 import { runLiveDemo, simulateInboundMessage } from "@/lib/events/live";
 import { clock, sgd } from "@/lib/format";
-import { useHub } from "@/lib/mock/store";
+import { useUi } from "@/lib/ui-store";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -47,7 +47,7 @@ const kpiIcons = [Users, FileCheck2, ClipboardCheck, BadgeCheck, Activity, Circl
 function DashboardPage() {
   const dashboard = useQuery(dashboardQuery());
   const inquiries = useQuery(inquiriesQuery());
-  const demoRunning = useHub((s) => s.demoRunning);
+  const demoRunning = useUi((s) => s.demoRunning);
   const [busy, setBusy] = useState(false);
 
   const summary = dashboard.data?.summary;
@@ -86,7 +86,6 @@ function DashboardPage() {
                     name: "Rachel Foong",
                     channel: "WHATSAPP",
                     message: "Hi, how much for a health screening in Batam including ferry? Travelling next week.",
-                    treatmentId: "trt_health_screening",
                   });
                 } finally {
                   setBusy(false);
