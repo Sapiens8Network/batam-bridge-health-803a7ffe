@@ -44,7 +44,9 @@ let notificationCtx: AudioContext | null = null;
 export function playInboundChime() {
   if (typeof window === "undefined") return;
   try {
-    const Ctor = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    const Ctor =
+      window.AudioContext ??
+      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (!Ctor) return;
     notificationCtx ??= new Ctor();
     const ctx = notificationCtx;
@@ -72,7 +74,10 @@ export async function simulateInboundMessage(input: {
   chime?: boolean;
 }) {
   const payload = { name: input.name, message: input.message };
-  const res = input.channel === "TELEGRAM" ? await api.webhookTelegram(payload) : await api.webhookWhatsapp(payload);
+  const res =
+    input.channel === "TELEGRAM"
+      ? await api.webhookTelegram(payload)
+      : await api.webhookWhatsapp(payload);
   if (input.chime !== false) playInboundChime();
   toast.success(`New ${input.channel === "TELEGRAM" ? "Telegram" : "WhatsApp"} inquiry`, {
     description: `${input.name} · ${input.message.slice(0, 70)}…`,
@@ -93,7 +98,9 @@ export async function runLiveDemo(onInquiry?: (inquiryId: string) => void) {
   ui.setDemo(true, null);
 
   try {
-    toast.info("Inbound Telegram message received", { description: "Hermes is triaging the request…" });
+    toast.info("Inbound Telegram message received", {
+      description: "Hermes is triaging the request…",
+    });
     const inquiryId = await simulateInboundMessage({
       name: "Joel Mahendran",
       channel: "TELEGRAM",
@@ -106,7 +113,9 @@ export async function runLiveDemo(onInquiry?: (inquiryId: string) => void) {
     const view = await api.inquiry(inquiryId);
     if (view.inquiry.humanTakeover.active || !view.itinerary) {
       toast.warning("Case escalated to a coordinator", {
-        description: view.inquiry.humanTakeover.reasons[0] ?? "Hermes could not complete this case automatically.",
+        description:
+          view.inquiry.humanTakeover.reasons[0] ??
+          "Hermes could not complete this case automatically.",
       });
       return;
     }
@@ -123,7 +132,9 @@ export async function runLiveDemo(onInquiry?: (inquiryId: string) => void) {
     await api.sendItinerary(view.itinerary.id);
     toast.success("Patient notified on Telegram", { description: "Itinerary link delivered." });
   } catch (error) {
-    toast.error("Demo could not complete", { description: error instanceof Error ? error.message : "Unknown error" });
+    toast.error("Demo could not complete", {
+      description: error instanceof Error ? error.message : "Unknown error",
+    });
   } finally {
     useUi.getState().setDemo(false);
   }

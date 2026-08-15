@@ -60,7 +60,14 @@ export interface ChatPlan {
   benchmarkTotal: number;
   savings: number;
   savingsPct: number;
-  lines: { key: string; label: string; detail: string; price: number; optional: boolean; selected: boolean }[];
+  lines: {
+    key: string;
+    label: string;
+    detail: string;
+    price: number;
+    optional: boolean;
+    selected: boolean;
+  }[];
   options: {
     hospitals: OptionSummary[];
     treatments: OptionSummary[];
@@ -98,7 +105,11 @@ const GREETING =
 async function loadSession(token?: string | null): Promise<Row> {
   const sb = await db();
   if (token) {
-    const { data } = await sb.from("web_chat_sessions").select("*").eq("token", token).maybeSingle();
+    const { data } = await sb
+      .from("web_chat_sessions")
+      .select("*")
+      .eq("token", token)
+      .maybeSingle();
     if (data) return data;
   }
   const { data, error } = await sb
@@ -189,11 +200,20 @@ async function extract(
   try {
     const res = await fetch(GATEWAY, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "fetch" },
+      headers: {
+        "Content-Type": "application/json",
+        "Lovable-API-Key": apiKey,
+        "X-Lovable-AIG-SDK": "fetch",
+      },
       body: JSON.stringify({
         model: MODEL,
         instructions,
-        input: [{ role: "user", content: [{ type: "input_text", text: `${history}\nPatient: ${message}` }] }],
+        input: [
+          {
+            role: "user",
+            content: [{ type: "input_text", text: `${history}\nPatient: ${message}` }],
+          },
+        ],
         store: false,
         text: { format: { type: "json_schema", name: "chat_slots", strict: true, schema: SCHEMA } },
       }),
@@ -223,11 +243,14 @@ function fallback(catalogue: Row[], slots: ChatSlots, message: string): Extracti
   const lower = message.toLowerCase();
   const match =
     catalogue.find((t) => lower.includes(String(t["name"]).toLowerCase())) ??
-    catalogue.find((t) => ((t["keywords"] as string[]) ?? []).some((k) => lower.includes(k.toLowerCase()))) ??
+    catalogue.find((t) =>
+      ((t["keywords"] as string[]) ?? []).some((k) => lower.includes(k.toLowerCase())),
+    ) ??
     null;
 
   const dateMatch = /(\d{4}-\d{2}-\d{2})/.exec(message);
-  const peopleMatch = /(\d+)\s*(people|person|persons|pax|traveller|travelers|travellers|of us)/.exec(lower);
+  const peopleMatch =
+    /(\d+)\s*(people|person|persons|pax|traveller|travelers|travellers|of us)/.exec(lower);
   const nightsMatch = /(\d+)\s*(night|nights)/.exec(lower);
   const dayTrip = /day trip|same day|no hotel/.test(lower);
   const bareNumber = /^\s*(\d{1,2})\s*$/.exec(lower);
@@ -236,7 +259,11 @@ function fallback(catalogue: Row[], slots: ChatSlots, message: string): Extracti
     reply: "",
     treatment: match ? (match["name"] as string) : null,
     date: dateMatch?.[1] ?? null,
-    travellers: peopleMatch ? Number(peopleMatch[1]) : slots.travellers === null && bareNumber ? Number(bareNumber[1]) : null,
+    travellers: peopleMatch
+      ? Number(peopleMatch[1])
+      : slots.travellers === null && bareNumber
+        ? Number(bareNumber[1])
+        : null,
     nights: nightsMatch ? Number(nightsMatch[1]) : dayTrip ? 0 : null,
     notes: null,
   };
@@ -246,11 +273,18 @@ function fallback(catalogue: Row[], slots: ChatSlots, message: string): Extracti
   const travellers = next.travellers ?? slots.travellers;
   const nights = next.nights ?? slots.nights;
 
-  if (!treatment) next.reply = "Which treatment are you looking for? For example dental implants, LASIK or a health screening.";
-  else if (!date) next.reply = `Great — ${treatment} in Batam. Which date would you like to travel? (e.g. 2026-09-12)`;
+  if (!treatment)
+    next.reply =
+      "Which treatment are you looking for? For example dental implants, LASIK or a health screening.";
+  else if (!date)
+    next.reply = `Great — ${treatment} in Batam. Which date would you like to travel? (e.g. 2026-09-12)`;
   else if (travellers === null) next.reply = "How many people are travelling in total?";
-  else if (nights === null) next.reply = "Would you like to stay overnight in Batam? Tell me how many nights, or say day trip.";
-  else next.reply = "Perfect — your trip plan is ready below. Untick anything you don't need, or swap the hotel and ferry.";
+  else if (nights === null)
+    next.reply =
+      "Would you like to stay overnight in Batam? Tell me how many nights, or say day trip.";
+  else
+    next.reply =
+      "Perfect — your trip plan is ready below. Untick anything you don't need, or swap the hotel and ferry.";
 
   return next;
 }
@@ -259,22 +293,25 @@ function fallback(catalogue: Row[], slots: ChatSlots, message: string): Extracti
 
 async function buildPlan(selections: ChatSelections): Promise<ChatPlan | null> {
   const sb = await db();
-  const [treatments, hospitals, prices, benchmarks, ferries, hotels, transports] = await Promise.all([
-    sb.from("treatments").select("*").eq("active", true).order("name"),
-    sb.from("hospitals").select("*").eq("status", "ACTIVE").order("name"),
-    sb.from("hospital_treatment_prices").select("*").eq("status", "ACTIVE"),
-    sb.from("singapore_benchmarks").select("*").eq("status", "ACTIVE"),
-    sb.from("ferry_options").select("*").eq("status", "ACTIVE").order("estimated_cost_sgd"),
-    sb.from("hotels").select("*").eq("status", "ACTIVE").order("price_per_night_sgd"),
-    sb.from("transport_options").select("*").eq("status", "ACTIVE").order("estimated_cost_sgd"),
-  ]);
+  const [treatments, hospitals, prices, benchmarks, ferries, hotels, transports] =
+    await Promise.all([
+      sb.from("treatments").select("*").eq("active", true).order("name"),
+      sb.from("hospitals").select("*").eq("status", "ACTIVE").order("name"),
+      sb.from("hospital_treatment_prices").select("*").eq("status", "ACTIVE"),
+      sb.from("singapore_benchmarks").select("*").eq("status", "ACTIVE"),
+      sb.from("ferry_options").select("*").eq("status", "ACTIVE").order("estimated_cost_sgd"),
+      sb.from("hotels").select("*").eq("status", "ACTIVE").order("price_per_night_sgd"),
+      sb.from("transport_options").select("*").eq("status", "ACTIVE").order("estimated_cost_sgd"),
+    ]);
 
   const treatmentRows = treatments.data ?? [];
   const treatment = treatmentRows.find((t) => t["id"] === selections.treatmentId);
   if (!treatment) return null;
 
   const priceRows = (prices.data ?? []).filter((p) => p["treatment_id"] === treatment["id"]);
-  const hospitalRows = (hospitals.data ?? []).filter((h) => priceRows.some((p) => p["hospital_id"] === h["id"]));
+  const hospitalRows = (hospitals.data ?? []).filter((h) =>
+    priceRows.some((p) => p["hospital_id"] === h["id"]),
+  );
   const hospital = hospitalRows.find((h) => h["id"] === selections.hospitalId) ?? hospitalRows[0];
 
   const missing: string[] = [];
@@ -288,14 +325,18 @@ async function buildPlan(selections: ChatSelections): Promise<ChatPlan | null> {
   const hotelRows = hotels.data ?? [];
   const transportRows = (transports.data ?? []).filter((t) => t["type"] === "CAR");
 
-  const ferry = selections.ferryId ? ferryRows.find((f) => f["id"] === selections.ferryId) : ferryRows[0];
+  const ferry = selections.ferryId
+    ? ferryRows.find((f) => f["id"] === selections.ferryId)
+    : ferryRows[0];
   const hotel =
     selections.nights > 0
       ? selections.hotelId
         ? hotelRows.find((h) => h["id"] === selections.hotelId)
         : hotelRows[0]
       : undefined;
-  const transport = selections.transportId ? transportRows.find((t) => t["id"] === selections.transportId) : transportRows[0];
+  const transport = selections.transportId
+    ? transportRows.find((t) => t["id"] === selections.transportId)
+    : transportRows[0];
 
   const travellers = Math.max(1, selections.travellers);
   const nights = Math.max(0, selections.nights);
@@ -317,14 +358,29 @@ async function buildPlan(selections: ChatSelections): Promise<ChatPlan | null> {
 
   const total = n(Object.values(breakdown).reduce((a, b) => a + b, 0));
   const benchTreatment = n(benchmark?.["benchmark_average_sgd"]) * travellers;
-  const benchTotal = n(benchTreatment + n(benchmark?.["benchmark_travel_sgd"]) + n(benchmark?.["benchmark_accommodation_sgd"]));
+  const benchTotal = n(
+    benchTreatment +
+      n(benchmark?.["benchmark_travel_sgd"]) +
+      n(benchmark?.["benchmark_accommodation_sgd"]),
+  );
   const savings = n(benchTotal - total);
 
   const option = (row: Row | undefined, detail: string, price_: number): OptionSummary | null =>
-    row ? { id: row["id"] as string, name: (row["name"] as string) ?? "Option", detail, price: price_ } : null;
+    row
+      ? {
+          id: row["id"] as string,
+          name: (row["name"] as string) ?? "Option",
+          detail,
+          price: price_,
+        }
+      : null;
 
   return {
-    treatment: { id: treatment["id"] as string, name: treatment["name"] as string, category: treatment["category"] as string },
+    treatment: {
+      id: treatment["id"] as string,
+      name: treatment["name"] as string,
+      category: treatment["category"] as string,
+    },
     hospital: {
       id: (hospital?.["id"] as string) ?? "",
       name: (hospital?.["name"] as string) ?? "Pending hospital match",
@@ -341,14 +397,24 @@ async function buildPlan(selections: ChatSelections): Promise<ChatPlan | null> {
         key: "treatment",
         label: `${treatment["name"] as string} at ${(hospital?.["name"] as string) ?? "Batam hospital"}`,
         detail: `Consultation, procedure, diagnostics and medication · ${travellers} traveller(s)`,
-        price: n(breakdown.treatment + breakdown.doctorFee + breakdown.hospitalFee + breakdown.diagnostics + breakdown.medication),
+        price: n(
+          breakdown.treatment +
+            breakdown.doctorFee +
+            breakdown.hospitalFee +
+            breakdown.diagnostics +
+            breakdown.medication,
+        ),
         optional: false,
         selected: true,
       },
       {
         key: "ferry",
-        label: ferry ? `Return ferry · ${String(ferry["operator_name"] ?? "Scheduled ferry")}` : "Return ferry",
-        detail: ferry ? `${String(ferry["origin_terminal"])} → ${String(ferry["destination_terminal"])}` : "No ferry configured",
+        label: ferry
+          ? `Return ferry · ${String(ferry["operator_name"] ?? "Scheduled ferry")}`
+          : "Return ferry",
+        detail: ferry
+          ? `${String(ferry["origin_terminal"])} → ${String(ferry["destination_terminal"])}`
+          : "No ferry configured",
         price: breakdown.ferry,
         optional: true,
         selected: ferryIncluded,
@@ -356,15 +422,22 @@ async function buildPlan(selections: ChatSelections): Promise<ChatPlan | null> {
       {
         key: "hotel",
         label: hotel ? `Recovery hotel · ${String(hotel["name"])}` : "Recovery hotel",
-        detail: nights > 0 ? `${nights} night(s)${hotel ? ` · ${String(hotel["location"])}` : ""}` : "Day trip — no stay",
+        detail:
+          nights > 0
+            ? `${nights} night(s)${hotel ? ` · ${String(hotel["location"])}` : ""}`
+            : "Day trip — no stay",
         price: breakdown.hotel,
         optional: true,
         selected: hotelIncluded,
       },
       {
         key: "transport",
-        label: transport ? `Private transfers · ${String(transport["name"] ?? transport["type"])}` : "Private transfers",
-        detail: transport ? `${String(transport["origin"])} → ${String(transport["destination"])}, both ways` : "No transfer configured",
+        label: transport
+          ? `Private transfers · ${String(transport["name"] ?? transport["type"])}`
+          : "Private transfers",
+        detail: transport
+          ? `${String(transport["origin"])} → ${String(transport["destination"])}, both ways`
+          : "No transfer configured",
         price: breakdown.localTransport,
         optional: true,
         selected: transportIncluded,
@@ -430,7 +503,8 @@ function toPayload(row: Row, plan: ChatPlan | null): ChatSessionPayload {
 
 async function planFor(row: Row): Promise<ChatPlan | null> {
   const slots = slotsOf(row);
-  if (!slots.treatmentId || !slots.date || slots.travellers === null || slots.nights === null) return null;
+  if (!slots.treatmentId || !slots.date || slots.travellers === null || slots.nights === null)
+    return null;
   return buildPlan(selectionsOf(row, slots));
 }
 
@@ -457,7 +531,10 @@ export async function getSession(token?: string | null): Promise<ChatSessionPayl
   return payload;
 }
 
-export async function handleVisitorMessage(token: string | null, text: string): Promise<ChatSessionPayload> {
+export async function handleVisitorMessage(
+  token: string | null,
+  text: string,
+): Promise<ChatSessionPayload> {
   if (!text.trim()) throw new HubError("Empty message", 400);
   const sb = await db();
   const row = await loadSession(token);
@@ -467,7 +544,12 @@ export async function handleVisitorMessage(token: string | null, text: string): 
   const catalogue = treatmentRows ?? [];
   const slots = slotsOf(row);
 
-  const ai = await extract(catalogue.map((t) => t["name"] as string), slots, transcriptOf(row), text);
+  const ai = await extract(
+    catalogue.map((t) => t["name"] as string),
+    slots,
+    transcriptOf(row),
+    text,
+  );
   const guess = fallback(catalogue, slots, text);
   const merged: ChatSlots = {
     treatment: ai?.treatment ?? guess.treatment ?? slots.treatment,
@@ -483,7 +565,8 @@ export async function handleVisitorMessage(token: string | null, text: string): 
   merged.treatmentId = (matchedTreatment?.["id"] as string | undefined) ?? merged.treatmentId;
   if (matchedTreatment) merged.treatment = matchedTreatment["name"] as string;
 
-  const complete = !!merged.treatmentId && !!merged.date && merged.travellers !== null && merged.nights !== null;
+  const complete =
+    !!merged.treatmentId && !!merged.date && merged.travellers !== null && merged.nights !== null;
   const reply = complete
     ? (ai?.reply ??
       "Perfect — your trip plan is ready below. Untick anything you don't need, or swap the hotel and ferry.")
@@ -519,7 +602,10 @@ export async function handleVisitorMessage(token: string | null, text: string): 
   return toPayload(updated, await planFor(updated));
 }
 
-export async function updateSelections(token: string, patch: Partial<ChatSelections>): Promise<ChatSessionPayload> {
+export async function updateSelections(
+  token: string,
+  patch: Partial<ChatSelections>,
+): Promise<ChatSessionPayload> {
   const sb = await db();
   const row = await loadSession(token);
   if ((row["stage"] as string) === "BOOKED") return toPayload(row, await planFor(row));
@@ -581,7 +667,11 @@ export async function bookFromChat(
       patient_id: patientId,
       hospital_id: plan.hospital.id,
       treatment_id: plan.treatment.id,
-      original_message: transcriptOf(row).filter((t) => t.role === "USER").map((t) => t.text).join(" | ") || summary,
+      original_message:
+        transcriptOf(row)
+          .filter((t) => t.role === "USER")
+          .map((t) => t.text)
+          .join(" | ") || summary,
       channel: "WEB",
       status: "HOSPITAL_REVIEW_REQUIRED",
       hospital_review: "PENDING",
@@ -616,7 +706,12 @@ export async function bookFromChat(
     })) as never,
   );
 
-  await logEvent({ requestId, type: "MESSAGE_RECEIVED", message: "Website chat enquiry submitted", durationMs: 60 });
+  await logEvent({
+    requestId,
+    type: "MESSAGE_RECEIVED",
+    message: "Website chat enquiry submitted",
+    durationMs: 60,
+  });
   await logEvent({
     requestId,
     type: "TREATMENT_MATCHED",
@@ -654,14 +749,58 @@ export async function bookFromChat(
 
   const nights = selections.nights;
   const items = [
-    { day: 1, time: "07:30", type: "FERRY", title: "Ferry from Singapore", description: "Chosen sailing to Batam", location: "Singapore" },
-    { day: 1, time: "09:00", type: "TRANSPORT", title: "Arrival & private transfer", description: "Meet-and-greet and transfer", location: "Batam" },
-    { day: 1, time: "10:00", type: "TREATMENT", title: `${plan.treatment.name} appointment`, description: plan.hospital.name, location: plan.hospital.name },
+    {
+      day: 1,
+      time: "07:30",
+      type: "FERRY",
+      title: "Ferry from Singapore",
+      description: "Chosen sailing to Batam",
+      location: "Singapore",
+    },
+    {
+      day: 1,
+      time: "09:00",
+      type: "TRANSPORT",
+      title: "Arrival & private transfer",
+      description: "Meet-and-greet and transfer",
+      location: "Batam",
+    },
+    {
+      day: 1,
+      time: "10:00",
+      type: "TREATMENT",
+      title: `${plan.treatment.name} appointment`,
+      description: plan.hospital.name,
+      location: plan.hospital.name,
+    },
     ...(nights > 0
-      ? [{ day: 1, time: "16:00", type: "ACCOMMODATION", title: "Hotel check-in & recovery", description: "Recovery stay", location: "Batam" }]
+      ? [
+          {
+            day: 1,
+            time: "16:00",
+            type: "ACCOMMODATION",
+            title: "Hotel check-in & recovery",
+            description: "Recovery stay",
+            location: "Batam",
+          },
+        ]
       : []),
-    { day: nights > 0 ? 2 : 1, time: nights > 0 ? "10:00" : "15:00", type: "FOLLOW_UP", title: "Post-procedure review", description: "Follow-up check", location: plan.hospital.name },
-    { day: nights > 0 ? 2 : 1, time: nights > 0 ? "15:00" : "18:00", type: "FERRY", title: "Return ferry to Singapore", description: "Return sailing", location: "Batam" },
+    {
+      day: nights > 0 ? 2 : 1,
+      time: nights > 0 ? "10:00" : "15:00",
+      type: "FOLLOW_UP",
+      title: "Post-procedure review",
+      description: "Follow-up check",
+      location: plan.hospital.name,
+    },
+    {
+      day: nights > 0 ? 2 : 1,
+      time: nights > 0 ? "15:00" : "18:00",
+      type: "FERRY",
+      title: "Return ferry to Singapore",
+      description: "Return sailing",
+      location: "Batam",
+    },
   ];
   await sb.from("itinerary_items").insert(
     items.map((item, index) => ({
@@ -697,7 +836,13 @@ export async function bookFromChat(
     message: "Hospital confirmation of pricing and availability required",
     status: "ATTENTION",
   });
-  await audit({ requestId, entity: "itineraries", entityId: itineraryId, action: "ITINERARY_GENERATED", actor: "PATIENT_WEB" });
+  await audit({
+    requestId,
+    entity: "itineraries",
+    entityId: itineraryId,
+    action: "ITINERARY_GENERATED",
+    actor: "PATIENT_WEB",
+  });
 
   const booking = {
     reference: requestRow["reference"] as string,

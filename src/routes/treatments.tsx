@@ -5,7 +5,14 @@ import { MedicalDisclaimer } from "@/components/hub/Disclaimer";
 import { Pill } from "@/components/hub/Pill";
 import { ErrorBlock, LoadingBlock } from "@/components/hub/StateBlocks";
 import { HospitalShell, PageHeader } from "@/components/layout/HospitalShell";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { referenceQuery } from "@/lib/api/queries";
 import { pct, sgd } from "@/lib/format";
 
@@ -21,7 +28,10 @@ export const Route = createFileRoute("/treatments")({
           "Batam treatment catalogue with Singapore benchmark prices, expected savings, recovery nights and procedure duration.",
       },
       { property: "og:title", content: "Treatment Catalogue · MedBridge Pass" },
-      { property: "og:description", content: "Compare Batam treatment pricing against Singapore benchmarks." },
+      {
+        property: "og:description",
+        content: "Compare Batam treatment pricing against Singapore benchmarks.",
+      },
     ],
   }),
   component: TreatmentsPage,
@@ -32,7 +42,10 @@ function TreatmentsPage() {
 
   return (
     <HospitalShell>
-      <PageHeader title="Treatments" description="Catalogue powering every AI cost estimate and patient quote" />
+      <PageHeader
+        title="Treatments"
+        description="Catalogue powering every AI cost estimate and patient quote"
+      />
 
       {isPending ? (
         <LoadingBlock label="Loading catalogue" rows={5} />
@@ -60,8 +73,12 @@ function TreatmentsPage() {
                     <TableRow key={t.id}>
                       <TableCell className="font-medium">{t.name}</TableCell>
                       <TableCell className="text-sm">{t.category}</TableCell>
-                      <TableCell className="text-sm tabular-nums text-batam">{sgd(t.batamPrice)}</TableCell>
-                      <TableCell className="text-sm tabular-nums text-singapore">{sgd(t.singaporeBenchmark)}</TableCell>
+                      <TableCell className="text-sm tabular-nums text-batam">
+                        {sgd(t.batamPrice)}
+                      </TableCell>
+                      <TableCell className="text-sm tabular-nums text-singapore">
+                        {sgd(t.singaporeBenchmark)}
+                      </TableCell>
                       <TableCell>
                         <Pill tone="success">
                           {sgd(savings)} · {pct((savings / t.singaporeBenchmark) * 100)}

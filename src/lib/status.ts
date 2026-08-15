@@ -22,14 +22,29 @@ export const dotClass: Record<Tone, string> = {
   singapore: "bg-singapore",
 };
 
-export const inquiryStatusMeta: Record<InquiryStatus, { label: string; tone: Tone; short: string }> = {
+export const inquiryStatusMeta: Record<
+  InquiryStatus,
+  { label: string; tone: Tone; short: string }
+> = {
   NEW_INQUIRY: { label: "New inquiry", tone: "info", short: "New" },
   AI_PROCESSING: { label: "AI processing", tone: "info", short: "Processing" },
   AI_ITINERARY_READY: { label: "AI itinerary ready", tone: "batam", short: "Itinerary ready" },
-  HOSPITAL_REVIEW_REQUIRED: { label: "Hospital review required", tone: "warning", short: "Hospital review" },
-  DOCTOR_REVIEW_REQUIRED: { label: "Doctor review required", tone: "warning", short: "Doctor review" },
+  HOSPITAL_REVIEW_REQUIRED: {
+    label: "Hospital review required",
+    tone: "warning",
+    short: "Hospital review",
+  },
+  DOCTOR_REVIEW_REQUIRED: {
+    label: "Doctor review required",
+    tone: "warning",
+    short: "Doctor review",
+  },
   QUOTE_APPROVED: { label: "Quote approved", tone: "success", short: "Approved" },
-  PATIENT_CONFIRMATION_PENDING: { label: "Patient confirmation pending", tone: "info", short: "Awaiting patient" },
+  PATIENT_CONFIRMATION_PENDING: {
+    label: "Patient confirmation pending",
+    tone: "info",
+    short: "Awaiting patient",
+  },
   CONFIRMED_BOOKING: { label: "Confirmed booking", tone: "success", short: "Confirmed" },
   TRAVEL_READY: { label: "Travel ready", tone: "batam", short: "Travel ready" },
   COMPLETED: { label: "Completed", tone: "neutral", short: "Completed" },

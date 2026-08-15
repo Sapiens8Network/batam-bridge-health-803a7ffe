@@ -38,8 +38,10 @@ export function PatientMessagePreview({
   }, [totals.packageTotal, totals.benchmarkTotal, totals.savings]);
 
   const send = useMutation({
-    mutationFn: (target: Channel) => api.sendMessage({ patientId, inquiryId, channel: target, text }),
-    onSuccess: (_r, target) => toast.success(`Message sent on ${target === "WHATSAPP" ? "WhatsApp" : "Telegram"}`),
+    mutationFn: (target: Channel) =>
+      api.sendMessage({ patientId, inquiryId, channel: target, text }),
+    onSuccess: (_r, target) =>
+      toast.success(`Message sent on ${target === "WHATSAPP" ? "WhatsApp" : "Telegram"}`),
     onError: () => toast.error("Message could not be sent"),
   });
 
@@ -54,21 +56,33 @@ export function PatientMessagePreview({
         <Pill tone={lines >= 4 && lines <= 8 ? "success" : "warning"}>{lines} lines</Pill>
       </header>
       <div className="space-y-3 p-4">
-        <Textarea value={text} onChange={(e) => setText(e.target.value)} className="min-h-32 text-sm leading-6" />
+        <Textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="min-h-32 text-sm leading-6"
+        />
         <p className="text-xs text-muted-foreground">
-          AI-suggested wording is always editable and is never auto-sent. Keep patient messages to 4–8 lines.
+          AI-suggested wording is always editable and is never auto-sent. Keep patient messages to
+          4–8 lines.
         </p>
         <div className="flex flex-wrap gap-2">
           <Button size="sm" disabled={send.isPending} onClick={() => send.mutate("WHATSAPP")}>
             <Send className="size-4" /> Send WhatsApp
           </Button>
-          <Button size="sm" variant="secondary" disabled={send.isPending} onClick={() => send.mutate("TELEGRAM")}>
+          <Button
+            size="sm"
+            variant="secondary"
+            disabled={send.isPending}
+            onClick={() => send.mutate("TELEGRAM")}
+          >
             <Send className="size-4" /> Send Telegram
           </Button>
           <Button size="sm" variant="outline" onClick={() => setText(buildPatientMessage(totals))}>
             <RefreshCw className="size-4" /> Regenerate
           </Button>
-          <span className="self-center text-xs text-muted-foreground">Channel of record: {channel.toLowerCase()}</span>
+          <span className="self-center text-xs text-muted-foreground">
+            Channel of record: {channel.toLowerCase()}
+          </span>
         </div>
       </div>
     </section>

@@ -14,10 +14,14 @@ export const Route = createFileRoute("/settings")({
       { title: "Hospital Settings · MedBridge Pass" },
       {
         name: "description",
-        content: "Hospital profiles, messaging channel status and the orchestration pipeline that powers patient itineraries.",
+        content:
+          "Hospital profiles, messaging channel status and the orchestration pipeline that powers patient itineraries.",
       },
       { property: "og:title", content: "Hospital Settings · MedBridge Pass" },
-      { property: "og:description", content: "Channel connections and workflow configuration for Batam facilities." },
+      {
+        property: "og:description",
+        content: "Channel connections and workflow configuration for Batam facilities.",
+      },
     ],
   }),
   component: SettingsPage,
@@ -39,7 +43,10 @@ function SettingsPage() {
 
   return (
     <HospitalShell>
-      <PageHeader title="Settings" description="Facilities, channels and the orchestration pipeline" />
+      <PageHeader
+        title="Settings"
+        description="Facilities, channels and the orchestration pipeline"
+      />
 
       {isPending ? (
         <LoadingBlock label="Loading settings" rows={4} />
@@ -90,7 +97,8 @@ function SettingsPage() {
                 </li>
               </ul>
               <p className="mt-3 text-xs text-muted-foreground">
-                Messages are received and sent by the backend. This dashboard never talks to the AI agent directly.
+                Messages are received and sent by the backend. This dashboard never talks to the AI
+                agent directly.
               </p>
             </section>
 

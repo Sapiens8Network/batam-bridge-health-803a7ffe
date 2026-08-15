@@ -36,7 +36,10 @@ export const Route = createFileRoute("/messages")({
           "One inbox for WhatsApp and Telegram patient conversations, with editable AI-suggested replies and hospital takeover.",
       },
       { property: "og:title", content: "Unified Messaging Centre · MedBridge Pass" },
-      { property: "og:description", content: "Handle Singapore patient conversations across WhatsApp and Telegram." },
+      {
+        property: "og:description",
+        content: "Handle Singapore patient conversations across WhatsApp and Telegram.",
+      },
     ],
   }),
   component: MessagesPage,
@@ -63,7 +66,9 @@ function MessagesPage() {
       .filter((v) => search.channel === "ALL" || v.inquiry.channel === search.channel)
       .map((v) => ({
         view: v,
-        messages: all.filter((m) => m.inquiryId === v.inquiry.id).sort((a, b) => a.at.localeCompare(b.at)),
+        messages: all
+          .filter((m) => m.inquiryId === v.inquiry.id)
+          .sort((a, b) => a.at.localeCompare(b.at)),
       }))
       .sort((a, b) => (b.messages.at(-1)?.at ?? "").localeCompare(a.messages.at(-1)?.at ?? ""));
   }, [inquiries.data, messages.data, search.channel]);
@@ -134,25 +139,37 @@ function MessagesPage() {
               return (
                 <li key={thread.view.inquiry.id}>
                   <button
-                    onClick={() => void navigate({ to: ".", search: (prev) => ({ ...prev, patient: thread.view.patient.id }) })}
+                    onClick={() =>
+                      void navigate({
+                        to: ".",
+                        search: (prev) => ({ ...prev, patient: thread.view.patient.id }),
+                      })
+                    }
                     className={cn(
                       "w-full rounded-xl border bg-card p-3 text-left transition-colors hover:border-primary/40",
                       selected && "border-primary bg-accent/40",
                     )}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="truncate text-sm font-semibold">{thread.view.patient.name}</span>
+                      <span className="truncate text-sm font-semibold">
+                        {thread.view.patient.name}
+                      </span>
                       <ChannelPill channel={thread.view.inquiry.channel} />
                     </div>
                     <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{last?.body}</p>
-                    <p className="mt-1 text-[11px] text-muted-foreground">{last ? relative(last.at) : ""}</p>
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      {last ? relative(last.at) : ""}
+                    </p>
                   </button>
                 </li>
               );
             })}
           </ol>
 
-          <section className="flex min-h-[38rem] flex-col rounded-xl border bg-card" aria-label="Conversation">
+          <section
+            className="flex min-h-[38rem] flex-col rounded-xl border bg-card"
+            aria-label="Conversation"
+          >
             <header className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3">
               <div>
                 <h2 className="text-sm font-semibold">{active.view.patient.name}</h2>
@@ -226,7 +243,11 @@ function MessagesPage() {
                 className="min-h-24 text-sm"
               />
               <div className="flex flex-wrap items-center gap-2">
-                <Button size="sm" disabled={!reply.trim() || send.isPending} onClick={() => send.mutate(reply)}>
+                <Button
+                  size="sm"
+                  disabled={!reply.trim() || send.isPending}
+                  onClick={() => send.mutate(reply)}
+                >
                   <Send className="size-4" /> Reply
                 </Button>
                 <Button

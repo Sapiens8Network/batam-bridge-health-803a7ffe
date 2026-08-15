@@ -81,7 +81,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Seamless cross-border patient & medical experiences" },
       { name: "author", content: "MedBridge Pass" },
       { property: "og:title", content: "MedBridge Pass" },
-      { property: "og:description", content: "Seamless cross-border patient & medical experiences" },
+      {
+        property: "og:description",
+        content: "Seamless cross-border patient & medical experiences",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@MedBridgePass" },

@@ -35,7 +35,8 @@ export const Route = createFileRoute("/dashboard")({
       { property: "og:title", content: "Operations Dashboard · MedBridge Pass" },
       {
         property: "og:description",
-        content: "Track Singapore patient leads, AI-generated itineraries and hospital approvals in one place.",
+        content:
+          "Track Singapore patient leads, AI-generated itineraries and hospital approvals in one place.",
       },
     ],
   }),
@@ -53,12 +54,36 @@ function DashboardPage() {
   const summary = dashboard.data?.summary;
   const kpis = summary
     ? [
-        { label: "Singapore leads", value: String(summary.singaporeLeads), hint: "Active patient inquiries" },
-        { label: "AI itineraries generated", value: String(summary.itinerariesGenerated), hint: "Structured proposals" },
-        { label: "Hospital reviews pending", value: String(summary.hospitalReviewsPending), hint: "Awaiting confirmation" },
-        { label: "Confirmed bookings", value: String(summary.confirmedBookings), hint: "Travel-ready patients" },
-        { label: "Completed patients", value: String(summary.completedPatients), hint: "Journeys closed" },
-        { label: "Estimated patient savings", value: sgd(summary.estimatedSavings), hint: "Versus Singapore benchmark" },
+        {
+          label: "Singapore leads",
+          value: String(summary.singaporeLeads),
+          hint: "Active patient inquiries",
+        },
+        {
+          label: "AI itineraries generated",
+          value: String(summary.itinerariesGenerated),
+          hint: "Structured proposals",
+        },
+        {
+          label: "Hospital reviews pending",
+          value: String(summary.hospitalReviewsPending),
+          hint: "Awaiting confirmation",
+        },
+        {
+          label: "Confirmed bookings",
+          value: String(summary.confirmedBookings),
+          hint: "Travel-ready patients",
+        },
+        {
+          label: "Completed patients",
+          value: String(summary.completedPatients),
+          hint: "Journeys closed",
+        },
+        {
+          label: "Estimated patient savings",
+          value: sgd(summary.estimatedSavings),
+          hint: "Versus Singapore benchmark",
+        },
       ]
     : [];
 
@@ -85,7 +110,8 @@ function DashboardPage() {
                   await simulateInboundMessage({
                     name: "Rachel Foong",
                     channel: "WHATSAPP",
-                    message: "Hi, how much for a health screening in Batam including ferry? Travelling next week.",
+                    message:
+                      "Hi, how much for a health screening in Batam including ferry? Travelling next week.",
                   });
                 } finally {
                   setBusy(false);
@@ -112,10 +138,14 @@ function DashboardPage() {
             return (
               <article key={kpi.label} className="rounded-xl border bg-card p-4">
                 <div className="flex items-start justify-between gap-2">
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{kpi.label}</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    {kpi.label}
+                  </p>
                   <Icon className="size-4 text-primary" />
                 </div>
-                <p className="mt-2 text-2xl font-semibold tabular-nums text-foreground">{kpi.value}</p>
+                <p className="mt-2 text-2xl font-semibold tabular-nums text-foreground">
+                  {kpi.value}
+                </p>
                 <p className="mt-0.5 text-xs text-muted-foreground">{kpi.hint}</p>
               </article>
             );
@@ -137,7 +167,10 @@ function DashboardPage() {
             ) : inquiries.isError ? (
               <ErrorBlock onRetry={() => void inquiries.refetch()} />
             ) : attention.length === 0 ? (
-              <EmptyBlock title="Nothing waiting on the hospital" description="All active cases are with the AI agent or the patient." />
+              <EmptyBlock
+                title="Nothing waiting on the hospital"
+                description="All active cases are with the AI agent or the patient."
+              />
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
                 {attention.slice(0, 4).map((view) => (
@@ -162,7 +195,15 @@ function DashboardPage() {
                   {clock(item.at)}
                 </span>
                 <span className="min-w-0 flex-1 text-sm text-foreground">{item.label}</span>
-                <Pill tone={item.tone === "SUCCESS" ? "success" : item.tone === "ATTENTION" ? "warning" : "info"} />
+                <Pill
+                  tone={
+                    item.tone === "SUCCESS"
+                      ? "success"
+                      : item.tone === "ATTENTION"
+                        ? "warning"
+                        : "info"
+                  }
+                />
               </li>
             ))}
           </ol>

@@ -124,10 +124,12 @@ function ChatPage() {
             <Leaf className="size-4" />
             MedBridge Pass
           </div>
-          <h1 className="text-3xl font-semibold sm:text-4xl">Plan your Batam treatment trip by chat</h1>
+          <h1 className="text-3xl font-semibold sm:text-4xl">
+            Plan your Batam treatment trip by chat
+          </h1>
           <p className="max-w-2xl text-sm text-white/85">
-            Tell our care assistant what you need. We build the full plan — hospital, ferry, hotel and
-            transfers — from real hospital pricing, and you keep only what you want.
+            Tell our care assistant what you need. We build the full plan — hospital, ferry, hotel
+            and transfers — from real hospital pricing, and you keep only what you want.
           </p>
         </div>
       </header>
@@ -144,7 +146,11 @@ function ChatPage() {
               <p className="text-xs text-muted-foreground">Structured intake · no medical advice</p>
             </div>
             <Pill tone={session?.stage === "BOOKED" ? "success" : "info"}>
-              {session?.stage === "BOOKED" ? "Submitted" : session?.stage === "PLAN_READY" ? "Plan ready" : "Collecting details"}
+              {session?.stage === "BOOKED"
+                ? "Submitted"
+                : session?.stage === "PLAN_READY"
+                  ? "Plan ready"
+                  : "Collecting details"}
             </Pill>
           </div>
 
@@ -213,11 +219,19 @@ function ChatPage() {
             <Input
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
-              placeholder={session?.stage === "BOOKED" ? "Your request has been submitted" : "Type your message…"}
+              placeholder={
+                session?.stage === "BOOKED"
+                  ? "Your request has been submitted"
+                  : "Type your message…"
+              }
               disabled={!session || session.stage === "BOOKED"}
               aria-label="Message the care assistant"
             />
-            <Button type="submit" size="icon" disabled={!session || send.isPending || session.stage === "BOOKED"}>
+            <Button
+              type="submit"
+              size="icon"
+              disabled={!session || send.isPending || session.stage === "BOOKED"}
+            >
               <Send className="size-4" />
               <span className="sr-only">Send</span>
             </Button>
@@ -234,27 +248,31 @@ function ChatPage() {
                 priced plan you can adjust line by line.
               </p>
               <ul className="mt-3 space-y-1.5 text-xs">
-                {(["Treatment", "Travel date", "Travellers", "Nights in Batam"] as const).map((label, i) => {
-                  const done = [
-                    !!session?.slots.treatmentId,
-                    !!session?.slots.date,
-                    session?.slots.travellers != null,
-                    session?.slots.nights != null,
-                  ][i];
-                  return (
-                    <li key={label} className="flex items-center gap-2">
-                      <span
-                        className={cn(
-                          "grid size-4 place-items-center rounded-full border",
-                          done ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/40",
-                        )}
-                      >
-                        {done && <Check className="size-3" />}
-                      </span>
-                      {label}
-                    </li>
-                  );
-                })}
+                {(["Treatment", "Travel date", "Travellers", "Nights in Batam"] as const).map(
+                  (label, i) => {
+                    const done = [
+                      !!session?.slots.treatmentId,
+                      !!session?.slots.date,
+                      session?.slots.travellers != null,
+                      session?.slots.nights != null,
+                    ][i];
+                    return (
+                      <li key={label} className="flex items-center gap-2">
+                        <span
+                          className={cn(
+                            "grid size-4 place-items-center rounded-full border",
+                            done
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-muted-foreground/40",
+                          )}
+                        >
+                          {done && <Check className="size-3" />}
+                        </span>
+                        {label}
+                      </li>
+                    );
+                  },
+                )}
               </ul>
             </div>
           )}
@@ -262,7 +280,9 @@ function ChatPage() {
           {plan && (
             <div className="space-y-4 rounded-2xl border bg-card p-5 shadow-sm">
               <div>
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">Recommended plan</p>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Recommended plan
+                </p>
                 <h2 className="mt-1 text-lg font-semibold">{plan.treatment.name}</h2>
                 <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
                   <Building2 className="size-3.5" />
@@ -285,7 +305,12 @@ function ChatPage() {
                         <p className="text-xs text-muted-foreground">{line.detail}</p>
                       </div>
                       <div className="flex shrink-0 items-center gap-2">
-                        <span className={cn("text-sm font-semibold", !line.selected && "text-muted-foreground line-through")}>
+                        <span
+                          className={cn(
+                            "text-sm font-semibold",
+                            !line.selected && "text-muted-foreground line-through",
+                          )}
+                        >
                           {sgd(line.price)}
                         </span>
                         {line.optional && selections && (
@@ -294,17 +319,27 @@ function ChatPage() {
                             aria-label={`Include ${line.label}`}
                             disabled={select.isPending || session?.stage === "BOOKED"}
                             onCheckedChange={(checked) => {
-                              if (line.key === "concierge") return select.mutate({ includeConcierge: checked });
+                              if (line.key === "concierge")
+                                return select.mutate({ includeConcierge: checked });
                               if (line.key === "ferry")
-                                return select.mutate({ ferryId: checked ? (plan.options.ferries[0]?.id ?? null) : "NONE" });
+                                return select.mutate({
+                                  ferryId: checked ? (plan.options.ferries[0]?.id ?? null) : "NONE",
+                                });
                               if (line.key === "hotel")
                                 return select.mutate(
                                   checked
-                                    ? { hotelId: plan.options.hotels[0]?.id ?? null, nights: Math.max(1, selections.nights) }
+                                    ? {
+                                        hotelId: plan.options.hotels[0]?.id ?? null,
+                                        nights: Math.max(1, selections.nights),
+                                      }
                                     : { hotelId: "NONE" },
                                 );
                               if (line.key === "transport")
-                                return select.mutate({ transportId: checked ? (plan.options.transports[0]?.id ?? null) : "NONE" });
+                                return select.mutate({
+                                  transportId: checked
+                                    ? (plan.options.transports[0]?.id ?? null)
+                                    : "NONE",
+                                });
                             }}
                           />
                         )}
@@ -360,7 +395,8 @@ function ChatPage() {
                     Request {session.booking?.reference} sent to {plan.hospital.name}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    The hospital confirms pricing and availability, then your itinerary is finalised.
+                    The hospital confirms pricing and availability, then your itinerary is
+                    finalised.
                   </p>
                   {session.booking?.itineraryToken && (
                     <Button asChild className="w-full">
@@ -380,18 +416,38 @@ function ChatPage() {
                 >
                   <div className="space-y-1.5">
                     <Label htmlFor="chat-name">Your name</Label>
-                    <Input id="chat-name" value={name} onChange={(e) => setName(e.target.value)} required />
+                    <Input
+                      id="chat-name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                    />
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="chat-phone">Mobile (optional)</Label>
-                    <Input id="chat-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+65…" />
+                    <Input
+                      id="chat-phone"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+65…"
+                    />
                   </div>
-                  <Button type="submit" className="w-full" disabled={book.isPending || !name.trim()}>
-                    {book.isPending ? <Loader2 className="mr-1 size-4 animate-spin" /> : <Ship className="mr-1 size-4" />}
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={book.isPending || !name.trim()}
+                  >
+                    {book.isPending ? (
+                      <Loader2 className="mr-1 size-4 animate-spin" />
+                    ) : (
+                      <Ship className="mr-1 size-4" />
+                    )}
                     Book this plan
                   </Button>
                   {book.isError && (
-                    <p className="text-xs text-destructive">We couldn't submit that — please try again.</p>
+                    <p className="text-xs text-destructive">
+                      We couldn't submit that — please try again.
+                    </p>
                   )}
                 </form>
               )}
@@ -425,7 +481,9 @@ function OptionSwitcher({
           onClick={() => onPick(option.id)}
           className={cn(
             "rounded-lg border px-2.5 py-1.5 text-left text-xs transition-colors",
-            option.id === activeId ? "border-primary bg-primary/5 text-foreground" : "text-muted-foreground hover:border-primary/50",
+            option.id === activeId
+              ? "border-primary bg-primary/5 text-foreground"
+              : "text-muted-foreground hover:border-primary/50",
           )}
         >
           <span className="block font-medium">{option.name}</span>

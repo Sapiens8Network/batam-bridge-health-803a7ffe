@@ -17,7 +17,8 @@ export const Route = createFileRoute("/patients/$id")({
       { title: "Patient Record · MedBridge Pass" },
       {
         name: "description",
-        content: "Patient profile with case history, communication channel and every Batam medical travel inquiry.",
+        content:
+          "Patient profile with case history, communication channel and every Batam medical travel inquiry.",
       },
       { property: "og:title", content: "Patient Record · MedBridge Pass" },
       { property: "og:description", content: "Full case history for one cross-border patient." },
@@ -117,8 +118,14 @@ function PatientDetailPage() {
                   <Pill tone={authorTone[m.author]}>{m.author.replace("_", " ")}</Pill>
                   <span className="text-[11px] text-muted-foreground">{dateTime(m.at)}</span>
                 </div>
-                <p className="mt-1.5 whitespace-pre-line text-sm leading-6 text-foreground">{m.body}</p>
-                {m.suggested ? <Pill tone="warning" className="mt-1.5">Suggested — not sent</Pill> : null}
+                <p className="mt-1.5 whitespace-pre-line text-sm leading-6 text-foreground">
+                  {m.body}
+                </p>
+                {m.suggested ? (
+                  <Pill tone="warning" className="mt-1.5">
+                    Suggested — not sent
+                  </Pill>
+                ) : null}
               </li>
             ))}
           </ol>

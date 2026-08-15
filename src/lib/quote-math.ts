@@ -8,7 +8,12 @@ export const medicalKeys: (keyof CostBreakdown)[] = [
   "medication",
 ];
 
-export const travelKeys: (keyof CostBreakdown)[] = ["ferry", "hotel", "localTransport", "otherServices"];
+export const travelKeys: (keyof CostBreakdown)[] = [
+  "ferry",
+  "hotel",
+  "localTransport",
+  "otherServices",
+];
 
 export const breakdownLabels: Record<keyof CostBreakdown, string> = {
   treatment: "Treatment cost",
@@ -26,7 +31,10 @@ export function benchmarkTotal(b: SingaporeBenchmark) {
   return b.treatment + b.travel + b.accommodation;
 }
 
-export function computeTotals(breakdown: CostBreakdown, benchmark: SingaporeBenchmark): QuoteTotals {
+export function computeTotals(
+  breakdown: CostBreakdown,
+  benchmark: SingaporeBenchmark,
+): QuoteTotals {
   const medicalSubtotal = medicalKeys.reduce((sum, k) => sum + (breakdown[k] || 0), 0);
   const travelSubtotal = travelKeys.reduce((sum, k) => sum + (breakdown[k] || 0), 0);
   const packageTotal = medicalSubtotal + travelSubtotal;
@@ -42,4 +50,5 @@ export function computeTotals(breakdown: CostBreakdown, benchmark: SingaporeBenc
   };
 }
 
-export const quoteTotals = (quote: Quote) => computeTotals(quote.breakdown, quote.singaporeBenchmark);
+export const quoteTotals = (quote: Quote) =>
+  computeTotals(quote.breakdown, quote.singaporeBenchmark);

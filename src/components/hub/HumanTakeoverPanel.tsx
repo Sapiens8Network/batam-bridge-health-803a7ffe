@@ -11,8 +11,10 @@ export function detectTakeoverReasons(inquiry: Inquiry): string[] {
   const reasons = new Set(inquiry.humanTakeover.reasons);
   const text = inquiry.originalMessage.toLowerCase();
   if (inquiry.aiRequest.confidence < 0.75) reasons.add("AI confidence below 75%");
-  if (/(diagnos|is it safe|should i|symptom)/.test(text)) reasons.add("Medical diagnosis or suitability request");
-  if (/(emergency|urgent|bleeding|severe pain|accident)/.test(text)) reasons.add("Emergency language detected");
+  if (/(diagnos|is it safe|should i|symptom)/.test(text))
+    reasons.add("Medical diagnosis or suitability request");
+  if (/(emergency|urgent|bleeding|severe pain|accident)/.test(text))
+    reasons.add("Emergency language detected");
   if (/(human|staff|call me|speak to someone)/.test(text)) reasons.add("Patient requested a human");
   if (!inquiry.aiRequest.treatment) reasons.add("Unknown procedure");
   return [...reasons];
@@ -24,7 +26,10 @@ export function HumanTakeoverPanel({ inquiry }: { inquiry: Inquiry }) {
 
   const mutation = useMutation({
     mutationFn: (action: "TAKE_OVER" | "ASSIGN" | "RETURN_TO_AI" | "CLOSE") =>
-      api.humanTakeover(inquiry.id, action === "ASSIGN" ? { action, staff: "Coordinator Aisha" } : { action }),
+      api.humanTakeover(
+        inquiry.id,
+        action === "ASSIGN" ? { action, staff: "Coordinator Aisha" } : { action },
+      ),
     onSuccess: (_r, action) =>
       toast.success(
         {
@@ -50,7 +55,9 @@ export function HumanTakeoverPanel({ inquiry }: { inquiry: Inquiry }) {
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex gap-3">
-          <PauseCircle className={active ? "mt-0.5 size-5 text-destructive" : "mt-0.5 size-5 text-warning"} />
+          <PauseCircle
+            className={active ? "mt-0.5 size-5 text-destructive" : "mt-0.5 size-5 text-warning"}
+          />
           <div>
             <h3 className="text-sm font-semibold text-foreground">
               {active ? "HUMAN_REVIEW_REQUIRED" : "Human review recommended"}
@@ -69,20 +76,35 @@ export function HumanTakeoverPanel({ inquiry }: { inquiry: Inquiry }) {
             </ul>
             {inquiry.humanTakeover.assignedStaff ? (
               <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
-                <CircleUserRound className="size-3.5" /> Handled by {inquiry.humanTakeover.assignedStaff}
+                <CircleUserRound className="size-3.5" /> Handled by{" "}
+                {inquiry.humanTakeover.assignedStaff}
               </p>
             ) : null}
           </div>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Button size="sm" disabled={mutation.isPending} onClick={() => mutation.mutate("TAKE_OVER")}>
+          <Button
+            size="sm"
+            disabled={mutation.isPending}
+            onClick={() => mutation.mutate("TAKE_OVER")}
+          >
             <Hand className="size-4" /> Take over
           </Button>
-          <Button size="sm" variant="outline" disabled={mutation.isPending} onClick={() => mutation.mutate("ASSIGN")}>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={mutation.isPending}
+            onClick={() => mutation.mutate("ASSIGN")}
+          >
             <UserPlus className="size-4" /> Assign staff
           </Button>
-          <Button size="sm" variant="outline" disabled={mutation.isPending} onClick={() => mutation.mutate("RETURN_TO_AI")}>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={mutation.isPending}
+            onClick={() => mutation.mutate("RETURN_TO_AI")}
+          >
             <Bot className="size-4" /> Return to AI
           </Button>
           <Button

@@ -61,11 +61,17 @@ export function InquiryCard({ view, className }: { view: InquiryView; className?
 
       <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 text-[11px]">
         <span className="text-muted-foreground">SG benchmark</span>
-        <span className="text-right font-medium tabular-nums text-singapore">{sgd(totals.benchmarkTotal)}</span>
+        <span className="text-right font-medium tabular-nums text-singapore">
+          {sgd(totals.benchmarkTotal)}
+        </span>
         <span className="text-muted-foreground">Batam treatment</span>
-        <span className="text-right font-medium tabular-nums">{sgd(quote.breakdown.treatment)}</span>
+        <span className="text-right font-medium tabular-nums">
+          {sgd(quote.breakdown.treatment)}
+        </span>
         <span className="text-muted-foreground">Complete trip</span>
-        <span className="text-right font-medium tabular-nums text-batam">{sgd(totals.packageTotal)}</span>
+        <span className="text-right font-medium tabular-nums text-batam">
+          {sgd(totals.packageTotal)}
+        </span>
         <span className="text-muted-foreground">Est. saving</span>
         <span className="text-right font-semibold tabular-nums text-success">
           {sgd(totals.savings)} · {pct(totals.savingsPct, 0)}
@@ -80,7 +86,9 @@ export function InquiryCard({ view, className }: { view: InquiryView; className?
       </div>
 
       <div className="mt-2 flex flex-wrap gap-1.5">
-        <Pill tone={reviewMeta[inquiry.hospitalReview].tone}>Hospital: {reviewMeta[inquiry.hospitalReview].label}</Pill>
+        <Pill tone={reviewMeta[inquiry.hospitalReview].tone}>
+          Hospital: {reviewMeta[inquiry.hospitalReview].label}
+        </Pill>
         <Pill tone={reviewMeta[inquiry.doctorReview.state].tone}>
           Doctor: {reviewMeta[inquiry.doctorReview.state].label}
         </Pill>

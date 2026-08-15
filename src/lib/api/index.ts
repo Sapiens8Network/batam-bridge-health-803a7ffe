@@ -78,7 +78,10 @@ export const api = {
    */
   quoteAction: (
     itineraryId: string,
-    body: { action: "SAVE_DRAFT" | "REQUEST_DOCTOR" | "APPROVE" | "REJECT" | "SEND"; breakdown?: CostBreakdown },
+    body: {
+      action: "SAVE_DRAFT" | "REQUEST_DOCTOR" | "APPROVE" | "REJECT" | "SEND";
+      breakdown?: CostBreakdown;
+    },
   ) =>
     quoteActionFn({
       data: {

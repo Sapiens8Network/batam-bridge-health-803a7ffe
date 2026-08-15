@@ -67,10 +67,12 @@ export const getDashboard = createServerFn({ method: "GET" }).handler(
   },
 );
 
-export const getInquiries = createServerFn({ method: "GET" }).handler(async (): Promise<InquiryViewPayload[]> => {
-  const { loadBundle, buildViews } = await import("./server/hub.server");
-  return buildViews(await loadBundle());
-});
+export const getInquiries = createServerFn({ method: "GET" }).handler(
+  async (): Promise<InquiryViewPayload[]> => {
+    const { loadBundle, buildViews } = await import("./server/hub.server");
+    return buildViews(await loadBundle());
+  },
+);
 
 export const getInquiry = createServerFn({ method: "GET" })
   .inputValidator((data: { id: string }) => data)
@@ -83,7 +85,9 @@ export const getInquiry = createServerFn({ method: "GET" })
   });
 
 export const getPatients = createServerFn({ method: "GET" }).handler(
-  async (): Promise<{ patient: Patient; inquiries: number; lastStatus: Inquiry["status"] | null }[]> => {
+  async (): Promise<
+    { patient: Patient; inquiries: number; lastStatus: Inquiry["status"] | null }[]
+  > => {
     const { loadBundle, buildViews, mapPatient } = await import("./server/hub.server");
     const bundle = await loadBundle();
     const views = buildViews(bundle);
@@ -97,19 +101,28 @@ export const getPatients = createServerFn({ method: "GET" }).handler(
 
 export const getPatient = createServerFn({ method: "GET" })
   .inputValidator((data: { id: string }) => data)
-  .handler(async ({ data }): Promise<{ patient: Patient; inquiries: InquiryViewPayload[]; messages: Message[] }> => {
-    const { db, loadBundle, buildViews, mapPatient, mapMessage, HubError } = await import("./server/hub.server");
-    const sb = await db();
-    const { data: row } = await sb.from("patients").select("*").eq("id", data.id).maybeSingle();
-    if (!row) throw new HubError("Patient not found", 404);
-    const { data: messages } = await sb
-      .from("messages")
-      .select("*")
-      .eq("patient_id", data.id)
-      .order("sent_at", { ascending: true });
-    const views = buildViews(await loadBundle()).filter((v) => v.inquiry.patientId === data.id);
-    return { patient: mapPatient(row), inquiries: views, messages: (messages ?? []).map(mapMessage) };
-  });
+  .handler(
+    async ({
+      data,
+    }): Promise<{ patient: Patient; inquiries: InquiryViewPayload[]; messages: Message[] }> => {
+      const { db, loadBundle, buildViews, mapPatient, mapMessage, HubError } =
+        await import("./server/hub.server");
+      const sb = await db();
+      const { data: row } = await sb.from("patients").select("*").eq("id", data.id).maybeSingle();
+      if (!row) throw new HubError("Patient not found", 404);
+      const { data: messages } = await sb
+        .from("messages")
+        .select("*")
+        .eq("patient_id", data.id)
+        .order("sent_at", { ascending: true });
+      const views = buildViews(await loadBundle()).filter((v) => v.inquiry.patientId === data.id);
+      return {
+        patient: mapPatient(row),
+        inquiries: views,
+        messages: (messages ?? []).map(mapMessage),
+      };
+    },
+  );
 
 export const getMessages = createServerFn({ method: "GET" })
   .inputValidator((data: { patientId?: string | undefined }) => data)
@@ -127,7 +140,11 @@ export const getAiActivity = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<AiActivityEvent[]> => {
     const { db, mapEvent } = await import("./server/hub.server");
     const sb = await db();
-    let query = sb.from("ai_activity_events").select("*").order("started_at", { ascending: true }).limit(500);
+    let query = sb
+      .from("ai_activity_events")
+      .select("*")
+      .order("started_at", { ascending: true })
+      .limit(500);
     if (data.inquiryId) query = query.eq("medical_request_id", data.inquiryId);
     const { data: rows } = await query;
     return (rows ?? []).map(mapEvent);
@@ -140,7 +157,10 @@ export const getItinerary = createServerFn({ method: "GET" })
     const sb = await db();
     const { data: row } = await sb.from("itineraries").select("*").eq("id", data.id).maybeSingle();
     if (!row) throw new HubError("Itinerary not found", 404);
-    const { data: items } = await sb.from("itinerary_items").select("*").eq("itinerary_id", data.id);
+    const { data: items } = await sb
+      .from("itinerary_items")
+      .select("*")
+      .eq("itinerary_id", data.id);
     const mapped = mapItinerary(row, items ?? [], row["medical_request_id"] as string);
     if (!mapped) throw new HubError("Itinerary not found", 404);
     return mapped;
@@ -154,17 +174,19 @@ export const getReference = createServerFn({ method: "GET" }).handler(
     transport: TransportOption[];
     treatments: Treatment[];
   }> => {
-    const { db, mapHospital, mapDoctor, mapHotel, mapTransport } = await import("./server/hub.server");
+    const { db, mapHospital, mapDoctor, mapHotel, mapTransport } =
+      await import("./server/hub.server");
     const sb = await db();
-    const [hospitals, doctors, hotels, transport, treatments, prices, benchmarks] = await Promise.all([
-      sb.from("hospitals").select("*").order("name"),
-      sb.from("doctors").select("*").order("name"),
-      sb.from("hotels").select("*").order("price_per_night_sgd"),
-      sb.from("transport_options").select("*").order("estimated_cost_sgd"),
-      sb.from("treatments").select("*").eq("active", true).order("name"),
-      sb.from("hospital_treatment_prices").select("*").eq("status", "ACTIVE"),
-      sb.from("singapore_benchmarks").select("*").eq("status", "ACTIVE"),
-    ]);
+    const [hospitals, doctors, hotels, transport, treatments, prices, benchmarks] =
+      await Promise.all([
+        sb.from("hospitals").select("*").order("name"),
+        sb.from("doctors").select("*").order("name"),
+        sb.from("hotels").select("*").order("price_per_night_sgd"),
+        sb.from("transport_options").select("*").order("estimated_cost_sgd"),
+        sb.from("treatments").select("*").eq("active", true).order("name"),
+        sb.from("hospital_treatment_prices").select("*").eq("status", "ACTIVE"),
+        sb.from("singapore_benchmarks").select("*").eq("status", "ACTIVE"),
+      ]);
     return {
       hospitals: (hospitals.data ?? []).map(mapHospital),
       doctors: (doctors.data ?? []).map(mapDoctor),
@@ -191,101 +213,135 @@ export const getReference = createServerFn({ method: "GET" }).handler(
   },
 );
 
-export const getAnalytics = createServerFn({ method: "GET" }).handler(async (): Promise<AnalyticsPayload> => {
-  const { db } = await import("./server/hub.server");
-  const sb = await db();
-  const [requests, itineraries, quotes, treatments, prices, benchmarks, events] = await Promise.all([
-    sb.from("medical_requests").select("id,status,hospital_review,treatment_id,created_at"),
-    sb.from("itineraries").select("id,total_batam_sgd,estimated_savings_sgd"),
-    sb.from("quotes").select("status,sent_at"),
-    sb.from("treatments").select("id,name").eq("active", true),
-    sb.from("hospital_treatment_prices").select("treatment_id,price_sgd").eq("status", "ACTIVE"),
-    sb.from("singapore_benchmarks").select("treatment_id,benchmark_average_sgd").eq("status", "ACTIVE"),
-    sb.from("ai_activity_events").select("started_at,duration_ms"),
-  ]);
+export const getAnalytics = createServerFn({ method: "GET" }).handler(
+  async (): Promise<AnalyticsPayload> => {
+    const { db } = await import("./server/hub.server");
+    const sb = await db();
+    const [requests, itineraries, quotes, treatments, prices, benchmarks, events] =
+      await Promise.all([
+        sb.from("medical_requests").select("id,status,hospital_review,treatment_id,created_at"),
+        sb.from("itineraries").select("id,total_batam_sgd,estimated_savings_sgd"),
+        sb.from("quotes").select("status,sent_at"),
+        sb.from("treatments").select("id,name").eq("active", true),
+        sb
+          .from("hospital_treatment_prices")
+          .select("treatment_id,price_sgd")
+          .eq("status", "ACTIVE"),
+        sb
+          .from("singapore_benchmarks")
+          .select("treatment_id,benchmark_average_sgd")
+          .eq("status", "ACTIVE"),
+        sb.from("ai_activity_events").select("started_at,duration_ms"),
+      ]);
 
-  const requestRows = requests.data ?? [];
-  const itineraryRows = itineraries.data ?? [];
-  const confirmed = requestRows.filter((r) =>
-    ["CONFIRMED_BOOKING", "TRAVEL_READY", "COMPLETED"].includes(r["status"] as string),
-  ).length;
+    const requestRows = requests.data ?? [];
+    const itineraryRows = itineraries.data ?? [];
+    const confirmed = requestRows.filter((r) =>
+      ["CONFIRMED_BOOKING", "TRAVEL_READY", "COMPLETED"].includes(r["status"] as string),
+    ).length;
 
-  const monthKey = (value: string) => new Date(value).toLocaleDateString("en-SG", { month: "short" });
-  const months = new Map<string, { month: string; inquiries: number; confirmed: number }>();
-  for (const row of requestRows) {
-    const key = monthKey(row["created_at"] as string);
-    const entry = months.get(key) ?? { month: key, inquiries: 0, confirmed: 0 };
-    entry.inquiries += 1;
-    if (["CONFIRMED_BOOKING", "TRAVEL_READY", "COMPLETED"].includes(row["status"] as string)) entry.confirmed += 1;
-    months.set(key, entry);
-  }
+    const monthKey = (value: string) =>
+      new Date(value).toLocaleDateString("en-SG", { month: "short" });
+    const months = new Map<string, { month: string; inquiries: number; confirmed: number }>();
+    for (const row of requestRows) {
+      const key = monthKey(row["created_at"] as string);
+      const entry = months.get(key) ?? { month: key, inquiries: 0, confirmed: 0 };
+      entry.inquiries += 1;
+      if (["CONFIRMED_BOOKING", "TRAVEL_READY", "COMPLETED"].includes(row["status"] as string))
+        entry.confirmed += 1;
+      months.set(key, entry);
+    }
 
-  const weeks = new Map<string, number[]>();
-  for (const event of events.data ?? []) {
-    if (event["duration_ms"] === null) continue;
-    const date = new Date(event["started_at"] as string);
-    const week = `W${String(Math.ceil(((date.getTime() - Date.UTC(date.getUTCFullYear(), 0, 1)) / 86400000 + 1) / 7))}`;
-    weeks.set(week, [...(weeks.get(week) ?? []), Number(event["duration_ms"])]);
-  }
+    const weeks = new Map<string, number[]>();
+    for (const event of events.data ?? []) {
+      if (event["duration_ms"] === null) continue;
+      const date = new Date(event["started_at"] as string);
+      const week = `W${String(Math.ceil(((date.getTime() - Date.UTC(date.getUTCFullYear(), 0, 1)) / 86400000 + 1) / 7))}`;
+      weeks.set(week, [...(weeks.get(week) ?? []), Number(event["duration_ms"])]);
+    }
 
-  const totals = itineraryRows.map((row) => ({
-    packageTotal: Number(row["total_batam_sgd"]),
-    savings: Number(row["estimated_savings_sgd"]),
-  }));
+    const totals = itineraryRows.map((row) => ({
+      packageTotal: Number(row["total_batam_sgd"]),
+      savings: Number(row["estimated_savings_sgd"]),
+    }));
 
-  return {
-    monthly: [...months.values()],
-    responseTimes: [...weeks.entries()]
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([week, values]) => ({
-        week,
-        minutes: Math.round((values.reduce((a, b) => a + b, 0) / values.length / 60000) * 100) / 100,
-      })),
-    byTreatment: (treatments.data ?? []).map((t) => ({
-      name: t["name"] as string,
-      patients: requestRows.filter((r) => r["treatment_id"] === t["id"]).length,
-      batam: Math.min(
-        ...((prices.data ?? []).filter((p) => p["treatment_id"] === t["id"]).map((p) => Number(p["price_sgd"])) as number[]),
-        Number.POSITIVE_INFINITY,
-      ),
-      singapore: Number(
-        (benchmarks.data ?? []).find((b) => b["treatment_id"] === t["id"])?.["benchmark_average_sgd"] ?? 0,
-      ),
-    })).map((row) => ({ ...row, batam: Number.isFinite(row.batam) ? row.batam : 0 })),
-    funnel: [
-      { stage: "Inquiries", count: requestRows.length },
-      { stage: "AI itinerary", count: itineraryRows.length },
-      { stage: "Hospital review", count: requestRows.filter((r) => r["hospital_review"] !== null).length },
-      {
-        stage: "Approved quote",
-        count: (quotes.data ?? []).filter((q) => q["status"] === "APPROVED" || q["sent_at"] !== null).length,
-      },
-      { stage: "Confirmed", count: confirmed },
-    ],
-    conversionRate: requestRows.length ? (confirmed / requestRows.length) * 100 : 0,
-    avgSavings: totals.length ? totals.reduce((a, b) => a + b.savings, 0) / totals.length : 0,
-    revenueOpportunity: totals.reduce((a, b) => a + b.packageTotal, 0),
-  };
-});
+    return {
+      monthly: [...months.values()],
+      responseTimes: [...weeks.entries()]
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .map(([week, values]) => ({
+          week,
+          minutes:
+            Math.round((values.reduce((a, b) => a + b, 0) / values.length / 60000) * 100) / 100,
+        })),
+      byTreatment: (treatments.data ?? [])
+        .map((t) => ({
+          name: t["name"] as string,
+          patients: requestRows.filter((r) => r["treatment_id"] === t["id"]).length,
+          batam: Math.min(
+            ...((prices.data ?? [])
+              .filter((p) => p["treatment_id"] === t["id"])
+              .map((p) => Number(p["price_sgd"])) as number[]),
+            Number.POSITIVE_INFINITY,
+          ),
+          singapore: Number(
+            (benchmarks.data ?? []).find((b) => b["treatment_id"] === t["id"])?.[
+              "benchmark_average_sgd"
+            ] ?? 0,
+          ),
+        }))
+        .map((row) => ({ ...row, batam: Number.isFinite(row.batam) ? row.batam : 0 })),
+      funnel: [
+        { stage: "Inquiries", count: requestRows.length },
+        { stage: "AI itinerary", count: itineraryRows.length },
+        {
+          stage: "Hospital review",
+          count: requestRows.filter((r) => r["hospital_review"] !== null).length,
+        },
+        {
+          stage: "Approved quote",
+          count: (quotes.data ?? []).filter(
+            (q) => q["status"] === "APPROVED" || q["sent_at"] !== null,
+          ).length,
+        },
+        { stage: "Confirmed", count: confirmed },
+      ],
+      conversionRate: requestRows.length ? (confirmed / requestRows.length) * 100 : 0,
+      avgSavings: totals.length ? totals.reduce((a, b) => a + b.savings, 0) / totals.length : 0,
+      revenueOpportunity: totals.reduce((a, b) => a + b.packageTotal, 0),
+    };
+  },
+);
 
 export const getPublicItinerary = createServerFn({ method: "GET" })
   .inputValidator((data: { token: string }) => data)
   .handler(async ({ data }): Promise<PatientItineraryPayload> => {
     const { db, mapItinerary, breakdownOf, HubError } = await import("./server/hub.server");
     const sb = await db();
-    const { data: itinerary } = await sb.from("itineraries").select("*").eq("public_token", data.token).maybeSingle();
+    const { data: itinerary } = await sb
+      .from("itineraries")
+      .select("*")
+      .eq("public_token", data.token)
+      .maybeSingle();
     if (!itinerary) throw new HubError("Itinerary not found", 404);
     if (new Date(itinerary["expires_at"] as string).getTime() < Date.now()) {
       throw new HubError("This itinerary link has expired", 410);
     }
     const [{ data: items }, { data: request }, { data: hospital }] = await Promise.all([
-      sb.from("itinerary_items").select("*").eq("itinerary_id", itinerary["id"] as string),
+      sb
+        .from("itinerary_items")
+        .select("*")
+        .eq("itinerary_id", itinerary["id"] as string),
       sb
         .from("medical_requests")
         .select("id,ai_request,patient_id")
         .eq("id", itinerary["medical_request_id"] as string)
         .maybeSingle(),
-      sb.from("hospitals").select("name,contact_phone").eq("id", itinerary["hospital_id"] as string).maybeSingle(),
+      sb
+        .from("hospitals")
+        .select("name,contact_phone")
+        .eq("id", itinerary["hospital_id"] as string)
+        .maybeSingle(),
     ]);
     const { data: patient } = await sb
       .from("patients")
@@ -295,8 +351,13 @@ export const getPublicItinerary = createServerFn({ method: "GET" })
 
     const breakdown = breakdownOf(itinerary);
     const medicalSubtotal =
-      breakdown.treatment + breakdown.doctorFee + breakdown.hospitalFee + breakdown.diagnostics + breakdown.medication;
-    const travelSubtotal = breakdown.ferry + breakdown.hotel + breakdown.localTransport + breakdown.otherServices;
+      breakdown.treatment +
+      breakdown.doctorFee +
+      breakdown.hospitalFee +
+      breakdown.diagnostics +
+      breakdown.medication;
+    const travelSubtotal =
+      breakdown.ferry + breakdown.hotel + breakdown.localTransport + breakdown.otherServices;
     const packageTotal = medicalSubtotal + travelSubtotal;
     const benchmark =
       Number(itinerary["singapore_benchmark_sgd"]) +
@@ -327,7 +388,10 @@ export const getPublicItinerary = createServerFn({ method: "GET" })
 /* -------------------------------------------------------------- writes ---- */
 
 export const inboundMessage = createServerFn({ method: "POST" })
-  .inputValidator((data: { name: string; message: string; channel: Channel; externalId?: string | undefined }) => data)
+  .inputValidator(
+    (data: { name: string; message: string; channel: Channel; externalId?: string | undefined }) =>
+      data,
+  )
   .handler(async ({ data }): Promise<{ inquiryId: string }> => {
     const { processInbound } = await import("./server/hermes.server");
     return processInbound({
@@ -343,7 +407,11 @@ export const updateQuotePricing = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: true }> => {
     const { db, persistCost, audit, HubError } = await import("./server/hub.server");
     const sb = await db();
-    const { data: itinerary } = await sb.from("itineraries").select("*").eq("id", data.itineraryId).maybeSingle();
+    const { data: itinerary } = await sb
+      .from("itineraries")
+      .select("*")
+      .eq("id", data.itineraryId)
+      .maybeSingle();
     if (!itinerary) throw new HubError("Itinerary not found", 404);
     await persistCost(data.itineraryId, data.breakdown, {
       treatment: Number(itinerary["singapore_benchmark_sgd"]),
@@ -377,7 +445,11 @@ export const quoteAction = createServerFn({ method: "POST" })
     const { db, persistCost, audit, logEvent, HubError } = await import("./server/hub.server");
     const { queueOutbound } = await import("./server/hermes.server");
     const sb = await db();
-    const { data: itinerary } = await sb.from("itineraries").select("*").eq("id", data.itineraryId).maybeSingle();
+    const { data: itinerary } = await sb
+      .from("itineraries")
+      .select("*")
+      .eq("id", data.itineraryId)
+      .maybeSingle();
     if (!itinerary) throw new HubError("Itinerary not found", 404);
     const requestId = itinerary["medical_request_id"] as string;
 
@@ -387,11 +459,17 @@ export const quoteAction = createServerFn({ method: "POST" })
         travel: Number(itinerary["singapore_benchmark_travel_sgd"]),
         accommodation: Number(itinerary["singapore_benchmark_accommodation_sgd"]),
       });
-      await sb.from("quotes").update({ source: "HOSPITAL_OVERRIDE" } as never).eq("itinerary_id", data.itineraryId);
+      await sb
+        .from("quotes")
+        .update({ source: "HOSPITAL_OVERRIDE" } as never)
+        .eq("itinerary_id", data.itineraryId);
     }
 
     if (data.action === "SAVE_DRAFT") {
-      await sb.from("quotes").update({ status: "DRAFT" } as never).eq("itinerary_id", data.itineraryId);
+      await sb
+        .from("quotes")
+        .update({ status: "DRAFT" } as never)
+        .eq("itinerary_id", data.itineraryId);
       await audit({ requestId, entity: "quotes", action: "QUOTE_UPDATED" });
       return { ok: true };
     }
@@ -403,14 +481,25 @@ export const quoteAction = createServerFn({ method: "POST" })
         .eq("hospital_id", itinerary["hospital_id"] as string)
         .limit(1)
         .maybeSingle();
-      await sb.from("quotes").update({ status: "PENDING_REVIEW" } as never).eq("itinerary_id", data.itineraryId);
+      await sb
+        .from("quotes")
+        .update({ status: "PENDING_REVIEW" } as never)
+        .eq("itinerary_id", data.itineraryId);
       await sb.from("doctor_reviews").insert({
         medical_request_id: requestId,
         doctor_id: (doctor?.["id"] as string | undefined) ?? null,
         status: "PENDING",
       } as never);
-      await sb.from("medical_requests").update({ status: "DOCTOR_REVIEW_REQUIRED" } as never).eq("id", requestId);
-      await logEvent({ requestId, type: "DOCTOR_REVIEW_REQUESTED", message: "Doctor review requested", status: "ATTENTION" });
+      await sb
+        .from("medical_requests")
+        .update({ status: "DOCTOR_REVIEW_REQUIRED" } as never)
+        .eq("id", requestId);
+      await logEvent({
+        requestId,
+        type: "DOCTOR_REVIEW_REQUESTED",
+        message: "Doctor review requested",
+        status: "ATTENTION",
+      });
       await audit({ requestId, entity: "doctor_reviews", action: "DOCTOR_REVIEW_REQUESTED" });
       return { ok: true };
     }
@@ -420,7 +509,10 @@ export const quoteAction = createServerFn({ method: "POST" })
         .from("quotes")
         .update({ status: "APPROVED", approved_at: new Date().toISOString() } as never)
         .eq("itinerary_id", data.itineraryId);
-      await sb.from("itineraries").update({ status: "HOSPITAL_CONFIRMED" } as never).eq("id", data.itineraryId);
+      await sb
+        .from("itineraries")
+        .update({ status: "HOSPITAL_CONFIRMED" } as never)
+        .eq("id", data.itineraryId);
       await sb
         .from("itinerary_items")
         .update({ status: "CONFIRMED" } as never)
@@ -429,23 +521,52 @@ export const quoteAction = createServerFn({ method: "POST" })
         .from("medical_requests")
         .update({ status: "QUOTE_APPROVED", hospital_review: "APPROVED" } as never)
         .eq("id", requestId);
-      await logEvent({ requestId, type: "QUOTE_APPROVED", message: "Hospital approved the quote", durationMs: 320 });
+      await logEvent({
+        requestId,
+        type: "QUOTE_APPROVED",
+        message: "Hospital approved the quote",
+        durationMs: 320,
+      });
       await audit({ requestId, entity: "quotes", action: "QUOTE_APPROVED" });
       return { ok: true };
     }
 
     if (data.action === "REJECT") {
-      await sb.from("quotes").update({ status: "REJECTED" } as never).eq("itinerary_id", data.itineraryId);
-      await sb.from("medical_requests").update({ hospital_review: "REJECTED" } as never).eq("id", requestId);
-      await logEvent({ requestId, type: "QUOTE_REJECTED", message: "Hospital rejected the quote", status: "ATTENTION" });
+      await sb
+        .from("quotes")
+        .update({ status: "REJECTED" } as never)
+        .eq("itinerary_id", data.itineraryId);
+      await sb
+        .from("medical_requests")
+        .update({ hospital_review: "REJECTED" } as never)
+        .eq("id", requestId);
+      await logEvent({
+        requestId,
+        type: "QUOTE_REJECTED",
+        message: "Hospital rejected the quote",
+        status: "ATTENTION",
+      });
       await audit({ requestId, entity: "quotes", action: "QUOTE_REJECTED" });
       return { ok: true };
     }
 
     /* SEND — gated on hospital approval */
-    const { data: quote } = await sb.from("quotes").select("*").eq("itinerary_id", data.itineraryId).maybeSingle();
-    if (quote?.["status"] !== "APPROVED") throw new HubError("The hospital must approve the quote before sending", 409);
-    await sendToPatient({ itineraryId: data.itineraryId, requestId, origin: data.origin, sb, queueOutbound, audit, logEvent });
+    const { data: quote } = await sb
+      .from("quotes")
+      .select("*")
+      .eq("itinerary_id", data.itineraryId)
+      .maybeSingle();
+    if (quote?.["status"] !== "APPROVED")
+      throw new HubError("The hospital must approve the quote before sending", 409);
+    await sendToPatient({
+      itineraryId: data.itineraryId,
+      requestId,
+      origin: data.origin,
+      sb,
+      queueOutbound,
+      audit,
+      logEvent,
+    });
     return { ok: true };
   });
 
@@ -460,7 +581,11 @@ export const sendItinerary = createServerFn({ method: "POST" })
   .inputValidator((data: { itineraryId: string; origin?: string | undefined }) => data)
   .handler(async ({ data }): Promise<{ ok: true }> => {
     await quoteAction({
-      data: { itineraryId: data.itineraryId, action: "SEND", ...(data.origin ? { origin: data.origin } : {}) },
+      data: {
+        itineraryId: data.itineraryId,
+        action: "SEND",
+        ...(data.origin ? { origin: data.origin } : {}),
+      },
     });
     return { ok: true };
   });
@@ -468,21 +593,30 @@ export const sendItinerary = createServerFn({ method: "POST" })
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function sendToPatient(ctx: any) {
   const { sb, itineraryId, requestId, origin, queueOutbound, audit, logEvent } = ctx;
-  const { data: itinerary } = await sb.from("itineraries").select("*").eq("id", itineraryId).maybeSingle();
+  const { data: itinerary } = await sb
+    .from("itineraries")
+    .select("*")
+    .eq("id", itineraryId)
+    .maybeSingle();
   const { data: request } = await sb
     .from("medical_requests")
     .select("patient_id,channel,ai_request")
     .eq("id", requestId)
     .maybeSingle();
-  const link = `${String(origin ?? "https://project--d711b2e9-8286-4b38-a76a-27e4f7a365a2.lovable.app")}/itinerary/${String(itinerary["public_token"])}`;
-  const treatment = ((request?.["ai_request"] ?? {}) as Record<string, unknown>)["treatment"] as string | undefined;
+  const baseUrl = origin ?? process.env["PUBLIC_APP_URL"] ?? "http://localhost:8080";
+  const link = `${String(baseUrl)}/itinerary/${String(itinerary["public_token"])}`;
+  const treatment = ((request?.["ai_request"] ?? {}) as Record<string, unknown>)["treatment"] as
+    string | undefined;
 
   await sb
     .from("quotes")
     .update({ status: "APPROVED", sent_at: new Date().toISOString() })
     .eq("itinerary_id", itineraryId);
   await sb.from("itineraries").update({ status: "SENT" }).eq("id", itineraryId);
-  await sb.from("medical_requests").update({ status: "PATIENT_CONFIRMATION_PENDING" }).eq("id", requestId);
+  await sb
+    .from("medical_requests")
+    .update({ status: "PATIENT_CONFIRMATION_PENDING" })
+    .eq("id", requestId);
   await queueOutbound({
     patientId: request["patient_id"] as string,
     requestId,
@@ -490,8 +624,18 @@ async function sendToPatient(ctx: any) {
     author: "HOSPITAL",
     text: `Your ${treatment ?? "care"} itinerary in Batam is confirmed by the hospital. Review and confirm your booking here: ${link}`,
   });
-  await logEvent({ requestId, type: "ITINERARY_SENT", message: "Patient notified with itinerary link", durationMs: 260 });
-  await audit({ requestId, entity: "itineraries", entityId: itineraryId, action: "ITINERARY_SENT" });
+  await logEvent({
+    requestId,
+    type: "ITINERARY_SENT",
+    message: "Patient notified with itinerary link",
+    durationMs: 260,
+  });
+  await audit({
+    requestId,
+    entity: "itineraries",
+    entityId: itineraryId,
+    action: "ITINERARY_SENT",
+  });
 }
 
 export const confirmItineraryByToken = createServerFn({ method: "POST" })
@@ -499,9 +643,14 @@ export const confirmItineraryByToken = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<{ ok: true }> => {
     const { db, audit, logEvent, HubError } = await import("./server/hub.server");
     const sb = await db();
-    const { data: itinerary } = await sb.from("itineraries").select("*").eq("public_token", data.token).maybeSingle();
+    const { data: itinerary } = await sb
+      .from("itineraries")
+      .select("*")
+      .eq("public_token", data.token)
+      .maybeSingle();
     if (!itinerary) throw new HubError("Itinerary not found", 404);
-    if (itinerary["status"] === "DRAFT") throw new HubError("This itinerary is not ready for confirmation", 409);
+    if (itinerary["status"] === "DRAFT")
+      throw new HubError("This itinerary is not ready for confirmation", 409);
     const requestId = itinerary["medical_request_id"] as string;
     const { data: request } = await sb
       .from("medical_requests")
@@ -509,12 +658,18 @@ export const confirmItineraryByToken = createServerFn({ method: "POST" })
       .eq("id", requestId)
       .maybeSingle();
 
-    await sb.from("itineraries").update({ status: "PATIENT_CONFIRMED" } as never).eq("id", itinerary["id"] as string);
+    await sb
+      .from("itineraries")
+      .update({ status: "PATIENT_CONFIRMED" } as never)
+      .eq("id", itinerary["id"] as string);
     await sb
       .from("itinerary_items")
       .update({ status: "CONFIRMED" } as never)
       .eq("itinerary_id", itinerary["id"] as string);
-    await sb.from("medical_requests").update({ status: "CONFIRMED_BOOKING" } as never).eq("id", requestId);
+    await sb
+      .from("medical_requests")
+      .update({ status: "CONFIRMED_BOOKING" } as never)
+      .eq("id", requestId);
     if (request) {
       await sb.from("messages").insert({
         patient_id: request["patient_id"] as string,
@@ -526,15 +681,28 @@ export const confirmItineraryByToken = createServerFn({ method: "POST" })
         delivery_status: "DELIVERED",
       } as never);
     }
-    await logEvent({ requestId, type: "PATIENT_CONFIRMED", message: "Patient confirmed the itinerary" });
-    await audit({ requestId, entity: "itineraries", entityId: itinerary["id"] as string, action: "PATIENT_CONFIRMED", actor: "PATIENT" });
+    await logEvent({
+      requestId,
+      type: "PATIENT_CONFIRMED",
+      message: "Patient confirmed the itinerary",
+    });
+    await audit({
+      requestId,
+      entity: "itineraries",
+      entityId: itinerary["id"] as string,
+      action: "PATIENT_CONFIRMED",
+      actor: "PATIENT",
+    });
     return { ok: true };
   });
 
 export const humanTakeover = createServerFn({ method: "POST" })
   .inputValidator(
-    (data: { inquiryId: string; action: "TAKE_OVER" | "ASSIGN" | "RETURN_TO_AI" | "CLOSE"; staff?: string | undefined }) =>
-      data,
+    (data: {
+      inquiryId: string;
+      action: "TAKE_OVER" | "ASSIGN" | "RETURN_TO_AI" | "CLOSE";
+      staff?: string | undefined;
+    }) => data,
   )
   .handler(async ({ data }): Promise<{ ok: true }> => {
     const { db, audit, logEvent } = await import("./server/hub.server");
@@ -549,7 +717,12 @@ export const humanTakeover = createServerFn({ method: "POST" })
           takeover_opened_at: new Date().toISOString(),
         } as never)
         .eq("id", data.inquiryId);
-      await logEvent({ requestId: data.inquiryId, type: "HUMAN_TAKEOVER", message: "Human takeover started", status: "ATTENTION" });
+      await logEvent({
+        requestId: data.inquiryId,
+        type: "HUMAN_TAKEOVER",
+        message: "Human takeover started",
+        status: "ATTENTION",
+      });
     } else if (data.action === "ASSIGN") {
       await sb
         .from("medical_requests")
@@ -572,7 +745,12 @@ export const humanTakeover = createServerFn({ method: "POST" })
         .update({ human_takeover: false, status: "COMPLETED" } as never)
         .eq("id", data.inquiryId);
     }
-    await audit({ requestId: data.inquiryId, entity: "medical_requests", entityId: data.inquiryId, action: data.action });
+    await audit({
+      requestId: data.inquiryId,
+      entity: "medical_requests",
+      entityId: data.inquiryId,
+      action: data.action,
+    });
     return { ok: true };
   });
 
@@ -616,8 +794,18 @@ export const doctorReview = createServerFn({ method: "POST" })
         .from("medical_requests")
         .update({ status: "HOSPITAL_REVIEW_REQUIRED", hospital_review: "PENDING" } as never)
         .eq("id", data.inquiryId);
-      await logEvent({ requestId: data.inquiryId, type: "DOCTOR_APPROVED", message: "Doctor approved the treatment plan", durationMs: 500 });
-      await audit({ requestId: data.inquiryId, entity: "doctor_reviews", action: "DOCTOR_APPROVED", actor: "DOCTOR" });
+      await logEvent({
+        requestId: data.inquiryId,
+        type: "DOCTOR_APPROVED",
+        message: "Doctor approved the treatment plan",
+        durationMs: 500,
+      });
+      await audit({
+        requestId: data.inquiryId,
+        entity: "doctor_reviews",
+        action: "DOCTOR_APPROVED",
+        actor: "DOCTOR",
+      });
     } else {
       await logEvent({
         requestId: data.inquiryId,
@@ -625,13 +813,20 @@ export const doctorReview = createServerFn({ method: "POST" })
         message: `Doctor decision: ${status.replace(/_/g, " ").toLowerCase()}`,
         status: "ATTENTION",
       });
-      await audit({ requestId: data.inquiryId, entity: "doctor_reviews", action: "DOCTOR_DECISION", actor: "DOCTOR" });
+      await audit({
+        requestId: data.inquiryId,
+        entity: "doctor_reviews",
+        action: "DOCTOR_DECISION",
+        actor: "DOCTOR",
+      });
     }
     return { ok: true };
   });
 
 export const sendStaffMessage = createServerFn({ method: "POST" })
-  .inputValidator((data: { patientId: string; inquiryId: string; channel: Channel; text: string }) => data)
+  .inputValidator(
+    (data: { patientId: string; inquiryId: string; channel: Channel; text: string }) => data,
+  )
   .handler(async ({ data }): Promise<{ ok: true }> => {
     const { audit, HubError } = await import("./server/hub.server");
     const { queueOutbound } = await import("./server/hermes.server");

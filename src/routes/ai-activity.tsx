@@ -21,7 +21,10 @@ export const Route = createFileRoute("/ai-activity")({
           "Real-time workflow events from the orchestration backend: treatment identification, pricing retrieval, itinerary generation and review flags.",
       },
       { property: "og:title", content: "AI Agent Activity · MedBridge Pass" },
-      { property: "og:description", content: "Audit the structured AI workflow behind every patient proposal." },
+      {
+        property: "og:description",
+        content: "Audit the structured AI workflow behind every patient proposal.",
+      },
     ],
   }),
   component: AiActivityPage,
@@ -31,7 +34,10 @@ function AiActivityPage() {
   const inquiries = useQuery(inquiriesQuery());
   const [selected, setSelected] = useState<string | null>(null);
   const activeId = selected ?? inquiries.data?.[0]?.inquiry.id ?? null;
-  const activity = useQuery({ ...activityQuery(activeId ?? undefined), enabled: Boolean(activeId) });
+  const activity = useQuery({
+    ...activityQuery(activeId ?? undefined),
+    enabled: Boolean(activeId),
+  });
 
   const structured = (() => {
     const view = inquiries.data?.find((v) => v.inquiry.id === activeId);

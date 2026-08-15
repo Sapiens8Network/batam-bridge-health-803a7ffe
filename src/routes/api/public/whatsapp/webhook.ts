@@ -16,7 +16,12 @@ const payloadSchema = z.object({
             z.object({
               value: z.object({
                 contacts: z
-                  .array(z.object({ wa_id: z.string(), profile: z.object({ name: z.string() }).partial() }))
+                  .array(
+                    z.object({
+                      wa_id: z.string(),
+                      profile: z.object({ name: z.string() }).partial(),
+                    }),
+                  )
                   .optional(),
                 messages: z
                   .array(

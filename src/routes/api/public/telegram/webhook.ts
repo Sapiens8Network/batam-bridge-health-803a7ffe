@@ -33,7 +33,9 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
         const connectionKey = process.env["TELEGRAM_API_KEY"];
         if (!connectionKey) return new Response("Telegram is not configured", { status: 503 });
 
-        const expected = createHash("sha256").update(`telegram-webhook:${connectionKey}`).digest("base64url");
+        const expected = createHash("sha256")
+          .update(`telegram-webhook:${connectionKey}`)
+          .digest("base64url");
         const provided = request.headers.get("X-Telegram-Bot-Api-Secret-Token") ?? "";
         if (!safeEqual(provided, expected)) return new Response("Unauthorized", { status: 401 });
 

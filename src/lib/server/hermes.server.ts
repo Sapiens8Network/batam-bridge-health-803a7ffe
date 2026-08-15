@@ -50,7 +50,10 @@ const SCHEMA = {
     "patientSummary",
   ],
   properties: {
-    intent: { type: "string", enum: ["MEDICAL_TOURISM", "GENERAL_ENQUIRY", "FOLLOW_UP", "UNCLEAR"] },
+    intent: {
+      type: "string",
+      enum: ["MEDICAL_TOURISM", "GENERAL_ENQUIRY", "FOLLOW_UP", "UNCLEAR"],
+    },
     treatment: { type: ["string", "null"] },
     treatmentCategory: { type: ["string", "null"] },
     confidence: { type: "number" },
@@ -118,8 +121,13 @@ async function callHermes(catalogue: string[], message: string): Promise<HermesE
       const payload = line.slice(5).trim();
       if (!payload || payload === "[DONE]") continue;
       try {
-        const event = JSON.parse(payload) as { type?: string; delta?: string; response?: { output_text?: string } };
-        if (event.type === "response.output_text.delta" && typeof event.delta === "string") text += event.delta;
+        const event = JSON.parse(payload) as {
+          type?: string;
+          delta?: string;
+          response?: { output_text?: string };
+        };
+        if (event.type === "response.output_text.delta" && typeof event.delta === "string")
+          text += event.delta;
         if (event.type === "response.completed" && !text && event.response?.output_text) {
           text = event.response.output_text;
         }
@@ -139,7 +147,10 @@ async function callHermes(catalogue: string[], message: string): Promise<HermesE
 }
 
 /** Deterministic keyword fallback so the pipeline still works without the model. */
-function keywordMatch(catalogue: { id: string; name: string; category: string; keywords: string[] }[], message: string) {
+function keywordMatch(
+  catalogue: { id: string; name: string; category: string; keywords: string[] }[],
+  message: string,
+) {
   const lower = message.toLowerCase();
   return (
     catalogue.find((t) => lower.includes(t.name.toLowerCase())) ??
@@ -182,7 +193,11 @@ export async function processInbound(input: InboundInput): Promise<{ inquiryId: 
   const externalId = input.externalId ?? null;
   let patientId: string | null = null;
   if (externalId) {
-    const { data } = await sb.from("patients").select("id").eq(channelKey, externalId).maybeSingle();
+    const { data } = await sb
+      .from("patients")
+      .select("id")
+      .eq(channelKey, externalId)
+      .maybeSingle();
     patientId = (data?.["id"] as string | undefined) ?? null;
   }
   if (!patientId) {
@@ -226,19 +241,43 @@ export async function processInbound(input: InboundInput): Promise<{ inquiryId: 
     raw_text: input.message,
     delivery_status: "DELIVERED",
   } as never);
-  await logEvent({ requestId, type: "MESSAGE_RECEIVED", message: "Inbound patient message received", durationMs: 120 });
-  await audit({ requestId, entity: "medical_requests", entityId: requestId, action: "INBOUND_MESSAGE", actor: input.channel });
+  await logEvent({
+    requestId,
+    type: "MESSAGE_RECEIVED",
+    message: "Inbound patient message received",
+    durationMs: 120,
+  });
+  await audit({
+    requestId,
+    entity: "medical_requests",
+    entityId: requestId,
+    action: "INBOUND_MESSAGE",
+    actor: input.channel,
+  });
 
   /* 3. Hermes structured extraction (with deterministic fallback) */
-  await logEvent({ requestId, type: "INTENT_DETECTION", message: "Hermes analysing patient message", status: "RUNNING" });
-  const extraction = await callHermes(catalogue.map((t) => t.name), input.message);
+  await logEvent({
+    requestId,
+    type: "INTENT_DETECTION",
+    message: "Hermes analysing patient message",
+    status: "RUNNING",
+  });
+  const extraction = await callHermes(
+    catalogue.map((t) => t.name),
+    input.message,
+  );
   const fallback = keywordMatch(catalogue, input.message);
 
   const matched = extraction?.treatment
-    ? (catalogue.find((t) => t.name.toLowerCase() === extraction.treatment!.toLowerCase()) ?? fallback)
+    ? (catalogue.find((t) => t.name.toLowerCase() === extraction.treatment!.toLowerCase()) ??
+      fallback)
     : fallback;
 
-  const confidence = extraction ? Math.min(1, Math.max(0, extraction.confidence)) : matched ? 0.7 : 0.3;
+  const confidence = extraction
+    ? Math.min(1, Math.max(0, extraction.confidence))
+    : matched
+      ? 0.7
+      : 0.3;
   const travellers = Math.max(1, Math.round(extraction?.travellers ?? 1));
   const nights = Math.max(0, Math.round(extraction?.nights ?? (matched ? 1 : 0)));
   const reasons: string[] = [...(extraction?.humanReasons ?? [])];
@@ -295,7 +334,13 @@ export async function processInbound(input: InboundInput): Promise<{ inquiryId: 
       status: "ATTENTION",
       metadata: { reasons: Array.from(new Set(reasons)) },
     });
-    await audit({ requestId, entity: "medical_requests", entityId: requestId, action: "HUMAN_TAKEOVER", actor: "HERMES_AI" });
+    await audit({
+      requestId,
+      entity: "medical_requests",
+      entityId: requestId,
+      action: "HUMAN_TAKEOVER",
+      actor: "HERMES_AI",
+    });
     await queueOutbound({
       patientId,
       requestId,
@@ -307,7 +352,12 @@ export async function processInbound(input: InboundInput): Promise<{ inquiryId: 
   }
 
   /* 5. cost engine on trusted data */
-  await logEvent({ requestId, type: "TREATMENT_MATCHED", message: `Treatment matched: ${matched.name}`, durationMs: 180 });
+  await logEvent({
+    requestId,
+    type: "TREATMENT_MATCHED",
+    message: `Treatment matched: ${matched.name}`,
+    durationMs: 180,
+  });
   const cost = await calculateCost({ hospitalId, treatmentId: matched.id, travellers, nights });
   if (cost.missing.length) {
     await sb
@@ -390,7 +440,13 @@ export async function processInbound(input: InboundInput): Promise<{ inquiryId: 
     message: "Hospital confirmation of pricing and availability required",
     status: "ATTENTION",
   });
-  await audit({ requestId, entity: "itineraries", entityId: itineraryId, action: "ITINERARY_GENERATED", actor: "HERMES_AI" });
+  await audit({
+    requestId,
+    entity: "itineraries",
+    entityId: itineraryId,
+    action: "ITINERARY_GENERATED",
+    actor: "HERMES_AI",
+  });
 
   await queueOutbound({
     patientId,
@@ -405,7 +461,12 @@ export async function processInbound(input: InboundInput): Promise<{ inquiryId: 
 
 async function createItineraryItems(
   itineraryId: string,
-  ctx: { treatment: string; ferry: Record<string, unknown> | null; hotel: Record<string, unknown> | null; nights: number },
+  ctx: {
+    treatment: string;
+    ferry: Record<string, unknown> | null;
+    hotel: Record<string, unknown> | null;
+    nights: number;
+  },
 ) {
   const sb = await db();
   const ferryName = (ctx.ferry?.["operator_name"] as string | undefined) ?? "Scheduled ferry";
@@ -414,14 +475,58 @@ async function createItineraryItems(
   const hotelName = (ctx.hotel?.["name"] as string | undefined) ?? "Recovery hotel";
 
   const items = [
-    { day: 1, time: "07:30", type: "FERRY", title: "Ferry from Singapore", description: `${ferryName} departure`, location: origin },
-    { day: 1, time: "09:00", type: "TRANSPORT", title: "Arrival & private transfer", description: "Meet-and-greet and transfer to hospital", location: destination },
-    { day: 1, time: "10:00", type: "TREATMENT", title: `${ctx.treatment} appointment`, description: "Consultation, diagnostics and procedure", location: "Hospital" },
+    {
+      day: 1,
+      time: "07:30",
+      type: "FERRY",
+      title: "Ferry from Singapore",
+      description: `${ferryName} departure`,
+      location: origin,
+    },
+    {
+      day: 1,
+      time: "09:00",
+      type: "TRANSPORT",
+      title: "Arrival & private transfer",
+      description: "Meet-and-greet and transfer to hospital",
+      location: destination,
+    },
+    {
+      day: 1,
+      time: "10:00",
+      type: "TREATMENT",
+      title: `${ctx.treatment} appointment`,
+      description: "Consultation, diagnostics and procedure",
+      location: "Hospital",
+    },
     ...(ctx.nights > 0
-      ? [{ day: 1, time: "16:00", type: "ACCOMMODATION", title: "Hotel check-in & recovery", description: hotelName, location: hotelName }]
+      ? [
+          {
+            day: 1,
+            time: "16:00",
+            type: "ACCOMMODATION",
+            title: "Hotel check-in & recovery",
+            description: hotelName,
+            location: hotelName,
+          },
+        ]
       : []),
-    { day: ctx.nights > 0 ? 2 : 1, time: ctx.nights > 0 ? "10:00" : "15:00", type: "FOLLOW_UP", title: "Post-procedure review", description: "Follow-up check and medication handover", location: "Hospital" },
-    { day: ctx.nights > 0 ? 2 : 1, time: ctx.nights > 0 ? "15:00" : "18:00", type: "FERRY", title: "Return ferry to Singapore", description: `${ferryName} return sailing`, location: destination },
+    {
+      day: ctx.nights > 0 ? 2 : 1,
+      time: ctx.nights > 0 ? "10:00" : "15:00",
+      type: "FOLLOW_UP",
+      title: "Post-procedure review",
+      description: "Follow-up check and medication handover",
+      location: "Hospital",
+    },
+    {
+      day: ctx.nights > 0 ? 2 : 1,
+      time: ctx.nights > 0 ? "15:00" : "18:00",
+      type: "FERRY",
+      title: "Return ferry to Singapore",
+      description: `${ferryName} return sailing`,
+      location: destination,
+    },
   ];
 
   await sb.from("itinerary_items").insert(
@@ -473,7 +578,11 @@ async function deliver(input: OutboundInput): Promise<boolean> {
   if (input.channel !== "TELEGRAM" || !lovableKey || !telegramKey) return false;
 
   const sb = await db();
-  const { data } = await sb.from("patients").select("telegram_id").eq("id", input.patientId).maybeSingle();
+  const { data } = await sb
+    .from("patients")
+    .select("telegram_id")
+    .eq("id", input.patientId)
+    .maybeSingle();
   const chatId = data?.["telegram_id"] as string | undefined;
   if (!chatId) return false;
 

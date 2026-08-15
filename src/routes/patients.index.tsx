@@ -5,7 +5,14 @@ import { ChannelPill } from "@/components/hub/InquiryCard";
 import { Pill } from "@/components/hub/Pill";
 import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/hub/StateBlocks";
 import { HospitalShell, PageHeader } from "@/components/layout/HospitalShell";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { patientsQuery } from "@/lib/api/queries";
 import { dateShort } from "@/lib/format";
 import { inquiryStatusMeta } from "@/lib/status";
@@ -16,10 +23,14 @@ export const Route = createFileRoute("/patients/")({
       { title: "Singapore Patients · MedBridge Pass" },
       {
         name: "description",
-        content: "Directory of Singapore patients travelling to Batam, their channels, preferred dates and case status.",
+        content:
+          "Directory of Singapore patients travelling to Batam, their channels, preferred dates and case status.",
       },
       { property: "og:title", content: "Singapore Patients · MedBridge Pass" },
-      { property: "og:description", content: "Manage cross-border patient records and case history." },
+      {
+        property: "og:description",
+        content: "Manage cross-border patient records and case history.",
+      },
     ],
   }),
   component: PatientsPage,
@@ -30,14 +41,20 @@ function PatientsPage() {
 
   return (
     <HospitalShell>
-      <PageHeader title="Patients" description="Singapore patients registered through WhatsApp and Telegram" />
+      <PageHeader
+        title="Patients"
+        description="Singapore patients registered through WhatsApp and Telegram"
+      />
 
       {isPending ? (
         <LoadingBlock label="Loading patients" rows={4} />
       ) : isError ? (
         <ErrorBlock onRetry={() => void refetch()} />
       ) : (data ?? []).length === 0 ? (
-        <EmptyBlock title="No patients yet" description="Patients appear here as soon as an inbound message arrives." />
+        <EmptyBlock
+          title="No patients yet"
+          description="Patients appear here as soon as an inbound message arrives."
+        />
       ) : (
         <div className="overflow-x-auto rounded-xl border bg-card">
           <Table>
@@ -58,10 +75,16 @@ function PatientsPage() {
               {(data ?? []).map((row) => (
                 <TableRow key={row.patient.id}>
                   <TableCell>
-                    <Link to="/patients/$id" params={{ id: row.patient.id }} className="font-medium hover:underline">
+                    <Link
+                      to="/patients/$id"
+                      params={{ id: row.patient.id }}
+                      className="font-medium hover:underline"
+                    >
                       {row.patient.name}
                     </Link>
-                    <span className="block text-[11px] text-muted-foreground">{row.patient.language}</span>
+                    <span className="block text-[11px] text-muted-foreground">
+                      {row.patient.language}
+                    </span>
                   </TableCell>
                   <TableCell className="text-sm">{row.patient.country}</TableCell>
                   <TableCell>
@@ -73,7 +96,9 @@ function PatientsPage() {
                   <TableCell className="text-sm tabular-nums">{row.inquiries}</TableCell>
                   <TableCell>
                     {row.lastStatus ? (
-                      <Pill tone={inquiryStatusMeta[row.lastStatus].tone}>{inquiryStatusMeta[row.lastStatus].short}</Pill>
+                      <Pill tone={inquiryStatusMeta[row.lastStatus].tone}>
+                        {inquiryStatusMeta[row.lastStatus].short}
+                      </Pill>
                     ) : (
                       <span className="text-xs text-muted-foreground">—</span>
                     )}

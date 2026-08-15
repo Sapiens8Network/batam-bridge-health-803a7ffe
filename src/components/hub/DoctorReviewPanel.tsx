@@ -13,7 +13,13 @@ import type { Doctor, Inquiry } from "@/lib/types";
 
 type Action = "APPROVE" | "MODIFY" | "REQUEST_INFO" | "REFER" | "REJECT";
 
-export function DoctorReviewPanel({ inquiry, doctor }: { inquiry: Inquiry; doctor: Doctor | null }) {
+export function DoctorReviewPanel({
+  inquiry,
+  doctor,
+}: {
+  inquiry: Inquiry;
+  doctor: Doctor | null;
+}) {
   const [note, setNote] = useState("");
   const review = inquiry.doctorReview;
 
@@ -27,7 +33,9 @@ export function DoctorReviewPanel({ inquiry, doctor }: { inquiry: Inquiry; docto
     onSuccess: (_r, action) => {
       setNote("");
       toast.success(
-        action === "APPROVE" ? "Doctor approval recorded" : `Doctor action recorded: ${action.replace("_", " ").toLowerCase()}`,
+        action === "APPROVE"
+          ? "Doctor approval recorded"
+          : `Doctor action recorded: ${action.replace("_", " ").toLowerCase()}`,
       );
     },
     onError: () => toast.error("Could not record doctor decision"),
@@ -47,14 +55,25 @@ export function DoctorReviewPanel({ inquiry, doctor }: { inquiry: Inquiry; docto
       <div className="space-y-4 p-4">
         <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           <Field label="Patient request" value={inquiry.aiRequest.treatment} />
-          <Field label="AI summary" value={`${inquiry.aiRequest.treatmentCategory} · ${Math.round(inquiry.aiRequest.confidence * 100)}% confidence`} />
+          <Field
+            label="AI summary"
+            value={`${inquiry.aiRequest.treatmentCategory} · ${Math.round(inquiry.aiRequest.confidence * 100)}% confidence`}
+          />
           <Field label="Proposed treatment" value={review.proposedTreatment ?? "Not set"} />
           <Field
             label="Estimated duration"
-            value={review.estimatedDurationMinutes ? `${review.estimatedDurationMinutes} minutes` : "—"}
+            value={
+              review.estimatedDurationMinutes ? `${review.estimatedDurationMinutes} minutes` : "—"
+            }
           />
-          <Field label="Assigned doctor" value={doctor ? `${doctor.name} · ${doctor.specialty}` : "Unassigned"} />
-          <Field label="Appointment" value={review.appointmentAt ? dateTime(review.appointmentAt) : "To be scheduled"} />
+          <Field
+            label="Assigned doctor"
+            value={doctor ? `${doctor.name} · ${doctor.specialty}` : "Unassigned"}
+          />
+          <Field
+            label="Appointment"
+            value={review.appointmentAt ? dateTime(review.appointmentAt) : "To be scheduled"}
+          />
         </dl>
 
         {review.state === "APPROVED" && review.decidedAt ? (
@@ -64,7 +83,8 @@ export function DoctorReviewPanel({ inquiry, doctor }: { inquiry: Inquiry; docto
           </p>
         ) : (
           <p className="rounded-lg border bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
-            No doctor approval has been recorded for this case yet. Treatment suitability is not confirmed.
+            No doctor approval has been recorded for this case yet. Treatment suitability is not
+            confirmed.
           </p>
         )}
 
@@ -76,16 +96,35 @@ export function DoctorReviewPanel({ inquiry, doctor }: { inquiry: Inquiry; docto
             className="min-h-20 text-sm"
           />
           <div className="flex flex-wrap gap-2">
-            <Button size="sm" disabled={mutation.isPending} onClick={() => mutation.mutate("APPROVE")}>
+            <Button
+              size="sm"
+              disabled={mutation.isPending}
+              onClick={() => mutation.mutate("APPROVE")}
+            >
               <Check className="size-4" /> Approve
             </Button>
-            <Button size="sm" variant="outline" disabled={mutation.isPending} onClick={() => mutation.mutate("MODIFY")}>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={mutation.isPending}
+              onClick={() => mutation.mutate("MODIFY")}
+            >
               <PencilLine className="size-4" /> Modify
             </Button>
-            <Button size="sm" variant="outline" disabled={mutation.isPending} onClick={() => mutation.mutate("REQUEST_INFO")}>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={mutation.isPending}
+              onClick={() => mutation.mutate("REQUEST_INFO")}
+            >
               <HelpCircle className="size-4" /> Request more information
             </Button>
-            <Button size="sm" variant="outline" disabled={mutation.isPending} onClick={() => mutation.mutate("REFER")}>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={mutation.isPending}
+              onClick={() => mutation.mutate("REFER")}
+            >
               <UserRoundSearch className="size-4" /> Refer to specialist
             </Button>
             <Button
