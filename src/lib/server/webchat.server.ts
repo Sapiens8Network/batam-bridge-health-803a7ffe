@@ -22,6 +22,8 @@ export interface ChatSlots {
   treatment: string | null;
   treatmentId: string | null;
   date: string | null;
+  patients: number | null;
+  companions: number | null;
   travellers: number | null;
   nights: number | null;
   notes: string | null;
@@ -34,6 +36,8 @@ export interface ChatSelections {
   hotelId: string | null;
   transportId: string | null;
   includeConcierge: boolean;
+  patients: number;
+  companions: number;
   travellers: number;
   nights: number;
   date: string | null;
@@ -92,6 +96,8 @@ const emptySlots: ChatSlots = {
   treatment: null,
   treatmentId: null,
   date: null,
+  patients: null,
+  companions: null,
   travellers: null,
   nights: null,
   notes: null,
@@ -135,6 +141,12 @@ function transcriptOf(row: Row): ChatTurn[] {
 
 function selectionsOf(row: Row, slots: ChatSlots): ChatSelections {
   const raw = (row["selections"] as Partial<ChatSelections>) ?? {};
+  const legacyTravellers = raw.travellers ?? slots.travellers ?? 1;
+  const patients = Math.max(1, raw.patients ?? slots.patients ?? 1);
+  const companions = Math.max(
+    0,
+    raw.companions ?? slots.companions ?? Math.max(0, legacyTravellers - patients),
+  );
   return {
     hospitalId: raw.hospitalId ?? null,
     treatmentId: raw.treatmentId ?? slots.treatmentId,
@@ -142,7 +154,9 @@ function selectionsOf(row: Row, slots: ChatSlots): ChatSelections {
     hotelId: raw.hotelId ?? null,
     transportId: raw.transportId ?? null,
     includeConcierge: raw.includeConcierge ?? true,
-    travellers: raw.travellers ?? slots.travellers ?? 1,
+    patients,
+    companions,
+    travellers: patients + companions,
     nights: raw.nights ?? slots.nights ?? 1,
     date: raw.date ?? slots.date ?? null,
   };
@@ -153,12 +167,13 @@ function selectionsOf(row: Row, slots: ChatSlots): ChatSelections {
 const SCHEMA = {
   type: "object",
   additionalProperties: false,
-  required: ["reply", "treatment", "date", "travellers", "nights", "notes"],
+  required: ["reply", "treatment", "date", "patients", "companions", "nights", "notes"],
   properties: {
     reply: { type: "string" },
     treatment: { type: ["string", "null"] },
     date: { type: ["string", "null"] },
-    travellers: { type: ["number", "null"] },
+    patients: { type: ["number", "null"] },
+    companions: { type: ["number", "null"] },
     nights: { type: ["number", "null"] },
     notes: { type: ["string", "null"] },
   },
@@ -168,7 +183,8 @@ interface Extraction {
   reply: string;
   treatment: string | null;
   date: string | null;
-  travellers: number | null;
+  patients: number | null;
+  companions: number | null;
   nights: number | null;
   notes: string | null;
 }
@@ -188,7 +204,8 @@ async function extract(
     "Never quote prices, never give clinical advice, never promise availability — the system prices the trip from the hospital database.",
     `Match "treatment" EXACTLY to one of: ${catalogue.join(" | ")}. Use null when unsure.`,
     "date = ISO yyyy-mm-dd when the patient names a date, otherwise null. nights = hotel nights in Batam (0 for day trip).",
-    "Ask for exactly one missing variable at a time, in this order: treatment, date, travellers, nights.",
+    "patients = how many people actually receive the treatment (minimum 1). companions = how many accompanying people travel along without treatment (0 when travelling alone). Never merge the two numbers.",
+    "Ask for exactly one missing variable at a time, in this order: treatment, date, patients, companions, nights.",
     `Already collected: ${JSON.stringify(slots)}. When everything is collected, confirm briefly that the plan is ready below.`,
   ].join(" ");
 
@@ -249,28 +266,42 @@ function fallback(catalogue: Row[], slots: ChatSlots, message: string): Extracti
     null;
 
   const dateMatch = /(\d{4}-\d{2}-\d{2})/.exec(message);
-  const peopleMatch =
-    /(\d+)\s*(people|person|persons|pax|traveller|travelers|travellers|of us)/.exec(lower);
+  const patientMatch = /(\d+)\s*(patient|patients|treatment for)/.exec(lower);
+  const companionMatch =
+    /(\d+)\s*(companion|companions|family member|family members|friend|friends|accompany|accompanying|coming with)/.exec(
+      lower,
+    );
   const nightsMatch = /(\d+)\s*(night|nights)/.exec(lower);
   const dayTrip = /day trip|same day|no hotel/.test(lower);
+  const alone = /just me|only me|by myself|alone|no one|nobody|none/.test(lower);
   const bareNumber = /^\s*(\d{1,2})\s*$/.exec(lower);
 
   const next: Extraction = {
     reply: "",
     treatment: match ? (match["name"] as string) : null,
     date: dateMatch?.[1] ?? null,
-    travellers: peopleMatch
-      ? Number(peopleMatch[1])
-      : slots.travellers === null && bareNumber
+    patients: patientMatch
+      ? Number(patientMatch[1])
+      : slots.patients === null && bareNumber
         ? Number(bareNumber[1])
-        : null,
+        : slots.patients === null && alone
+          ? 1
+          : null,
+    companions: companionMatch
+      ? Number(companionMatch[1])
+      : slots.patients !== null && slots.companions === null && bareNumber
+        ? Number(bareNumber[1])
+        : slots.patients !== null && slots.companions === null && alone
+          ? 0
+          : null,
     nights: nightsMatch ? Number(nightsMatch[1]) : dayTrip ? 0 : null,
     notes: null,
   };
 
   const treatment = next.treatment ?? slots.treatment;
   const date = next.date ?? slots.date;
-  const travellers = next.travellers ?? slots.travellers;
+  const patients = next.patients ?? slots.patients;
+  const companions = next.companions ?? slots.companions;
   const nights = next.nights ?? slots.nights;
 
   if (!treatment)
@@ -278,7 +309,11 @@ function fallback(catalogue: Row[], slots: ChatSlots, message: string): Extracti
       "Which treatment are you looking for? For example dental implants, LASIK or a health screening.";
   else if (!date)
     next.reply = `Great — ${treatment} in Batam. Which date would you like to travel? (e.g. 2026-09-12)`;
-  else if (travellers === null) next.reply = "How many people are travelling in total?";
+  else if (patients === null)
+    next.reply = "How many patients will be treated? (just you, or more people receiving treatment)";
+  else if (companions === null)
+    next.reply =
+      "How many companions are coming along without treatment? Say 0 if nobody is joining.";
   else if (nights === null)
     next.reply =
       "Would you like to stay overnight in Batam? Tell me how many nights, or say day trip.";
@@ -338,18 +373,20 @@ async function buildPlan(selections: ChatSelections): Promise<ChatPlan | null> {
     ? transportRows.find((t) => t["id"] === selections.transportId)
     : transportRows[0];
 
-  const travellers = Math.max(1, selections.travellers);
+  const patients = Math.max(1, selections.patients);
+  const companions = Math.max(0, selections.companions);
+  const travellers = patients + companions;
   const nights = Math.max(0, selections.nights);
   const ferryIncluded = selections.ferryId !== "NONE" && !!ferry;
   const hotelIncluded = nights > 0 && selections.hotelId !== "NONE" && !!hotel;
   const transportIncluded = selections.transportId !== "NONE" && !!transport;
 
   const breakdown: CostBreakdown = {
-    treatment: n(price?.["price_sgd"]) * travellers,
-    doctorFee: n(price?.["doctor_fee_sgd"]) * travellers,
-    hospitalFee: n(price?.["hospital_fee_sgd"]) * travellers,
-    diagnostics: n(price?.["diagnostics_sgd"]) * travellers,
-    medication: n(price?.["medication_sgd"]) * travellers,
+    treatment: n(price?.["price_sgd"]) * patients,
+    doctorFee: n(price?.["doctor_fee_sgd"]) * patients,
+    hospitalFee: n(price?.["hospital_fee_sgd"]) * patients,
+    diagnostics: n(price?.["diagnostics_sgd"]) * patients,
+    medication: n(price?.["medication_sgd"]) * patients,
     ferry: ferryIncluded ? n(ferry?.["estimated_cost_sgd"]) * travellers * 2 : 0,
     hotel: hotelIncluded ? n(hotel?.["price_per_night_sgd"]) * nights : 0,
     localTransport: transportIncluded ? n(transport?.["estimated_cost_sgd"]) * 2 : 0,
@@ -357,7 +394,7 @@ async function buildPlan(selections: ChatSelections): Promise<ChatPlan | null> {
   };
 
   const total = n(Object.values(breakdown).reduce((a, b) => a + b, 0));
-  const benchTreatment = n(benchmark?.["benchmark_average_sgd"]) * travellers;
+  const benchTreatment = n(benchmark?.["benchmark_average_sgd"]) * patients;
   const benchTotal = n(
     benchTreatment +
       n(benchmark?.["benchmark_travel_sgd"]) +
@@ -400,14 +437,14 @@ async function buildPlan(selections: ChatSelections): Promise<ChatPlan | null> {
           breakdown.diagnostics +
           breakdown.medication,
       );
-      const perTraveller = n(medicalTotal / travellers);
+      const perPatient = n(medicalTotal / patients);
       const money = (v: number) =>
         `$${v.toLocaleString("en-SG", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
       return [
         {
           key: "treatment",
           label: `${treatment["name"] as string} at ${(hospital?.["name"] as string) ?? "Batam hospital"}`,
-          detail: `${money(perTraveller)} per patient (treatment, doctor, hospital, diagnostics, medication) × ${travellers} traveller(s)`,
+          detail: `${money(perPatient)} per patient (treatment, doctor, hospital, diagnostics, medication) × ${patients} patient(s) — companions are not charged`,
           price: medicalTotal,
           optional: false,
           selected: true,
@@ -418,7 +455,7 @@ async function buildPlan(selections: ChatSelections): Promise<ChatPlan | null> {
             ? `Return ferry · ${String(ferry["operator_name"] ?? "Scheduled ferry")}`
             : "Return ferry",
           detail: ferry
-            ? `${String(ferry["origin_terminal"])} → ${String(ferry["destination_terminal"])} · ${money(n(ferry["estimated_cost_sgd"]))}/way × ${travellers} traveller(s) × 2 ways`
+            ? `${String(ferry["origin_terminal"])} → ${String(ferry["destination_terminal"])} · ${money(n(ferry["estimated_cost_sgd"]))}/way × ${travellers} traveller(s) (${patients} patient(s) + ${companions} companion(s)) × 2 ways`
             : "No ferry configured",
           price: breakdown.ferry,
           optional: true,
@@ -512,8 +549,9 @@ function toPayload(row: Row, plan: ChatPlan | null): ChatSessionPayload {
 
 async function planFor(row: Row): Promise<ChatPlan | null> {
   const slots = slotsOf(row);
-  if (!slots.treatmentId || !slots.date || slots.travellers === null || slots.nights === null)
-    return null;
+  const hasPeople =
+    (slots.patients !== null && slots.companions !== null) || slots.travellers !== null;
+  if (!slots.treatmentId || !slots.date || !hasPeople || slots.nights === null) return null;
   return buildPlan(selectionsOf(row, slots));
 }
 
@@ -560,11 +598,18 @@ export async function handleVisitorMessage(
     text,
   );
   const guess = fallback(catalogue, slots, text);
+  const mergedPatients = ai?.patients ?? guess.patients ?? slots.patients;
+  const mergedCompanions = ai?.companions ?? guess.companions ?? slots.companions;
   const merged: ChatSlots = {
     treatment: ai?.treatment ?? guess.treatment ?? slots.treatment,
     treatmentId: slots.treatmentId,
     date: ai?.date ?? guess.date ?? slots.date,
-    travellers: ai?.travellers ?? guess.travellers ?? slots.travellers,
+    patients: mergedPatients,
+    companions: mergedCompanions,
+    travellers:
+      mergedPatients !== null && mergedCompanions !== null
+        ? mergedPatients + mergedCompanions
+        : slots.travellers,
     nights: ai?.nights ?? guess.nights ?? slots.nights,
     notes: ai?.notes ?? slots.notes,
   };
@@ -575,7 +620,11 @@ export async function handleVisitorMessage(
   if (matchedTreatment) merged.treatment = matchedTreatment["name"] as string;
 
   const complete =
-    !!merged.treatmentId && !!merged.date && merged.travellers !== null && merged.nights !== null;
+    !!merged.treatmentId &&
+    !!merged.date &&
+    merged.patients !== null &&
+    merged.companions !== null &&
+    merged.nights !== null;
   const reply = complete
     ? (ai?.reply ??
       "Perfect — your trip plan is ready below. Untick anything you don't need, or swap the hotel and ferry.")
@@ -588,10 +637,14 @@ export async function handleVisitorMessage(
     { role: "AGENT", text: reply, at: now },
   ];
 
+  const patients = Math.max(1, merged.patients ?? 1);
+  const companions = Math.max(0, merged.companions ?? 0);
   const selections: ChatSelections = {
     ...selectionsOf(row, merged),
     treatmentId: merged.treatmentId,
-    travellers: merged.travellers ?? 1,
+    patients,
+    companions,
+    travellers: patients + companions,
     nights: merged.nights ?? 0,
     date: merged.date,
   };
@@ -619,10 +672,20 @@ export async function updateSelections(
   const row = await loadSession(token);
   if ((row["stage"] as string) === "BOOKED") return toPayload(row, await planFor(row));
   const slots = slotsOf(row);
-  const next: ChatSelections = { ...selectionsOf(row, slots), ...patch };
+  const merged: ChatSelections = { ...selectionsOf(row, slots), ...patch };
+  const patients = Math.max(1, Math.min(20, Math.round(merged.patients)));
+  const companions = Math.max(0, Math.min(20, Math.round(merged.companions)));
+  const next: ChatSelections = {
+    ...merged,
+    patients,
+    companions,
+    travellers: patients + companions,
+  };
   const nextSlots: ChatSlots = {
     ...slots,
     treatmentId: next.treatmentId,
+    patients,
+    companions,
     travellers: next.travellers,
     nights: next.nights,
     date: next.date,
@@ -668,7 +731,7 @@ export async function bookFromChat(
     patientId = data["id"] as string;
   }
 
-  const summary = `${plan.treatment.name} in Batam on ${selections.date ?? "TBC"} for ${selections.travellers} traveller(s), ${selections.nights} night(s).`;
+  const summary = `${plan.treatment.name} in Batam on ${selections.date ?? "TBC"} for ${selections.patients} patient(s) + ${selections.companions} companion(s) (${selections.travellers} travellers), ${selections.nights} night(s).`;
 
   const { data: requestRow, error: requestError } = await sb
     .from("medical_requests")

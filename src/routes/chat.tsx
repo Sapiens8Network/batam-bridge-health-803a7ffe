@@ -9,6 +9,8 @@ import {
   Check,
   Leaf,
   Loader2,
+  Minus,
+  Plus,
   Send,
   Ship,
   Sparkles,
@@ -248,32 +250,69 @@ function ChatPage() {
                 priced plan you can adjust line by line.
               </p>
               <ul className="mt-3 space-y-1.5 text-xs">
-                {(["Treatment", "Travel date", "Travellers", "Nights in Batam"] as const).map(
-                  (label, i) => {
-                    const done = [
-                      !!session?.slots.treatmentId,
-                      !!session?.slots.date,
-                      session?.slots.travellers != null,
-                      session?.slots.nights != null,
-                    ][i];
-                    return (
-                      <li key={label} className="flex items-center gap-2">
-                        <span
-                          className={cn(
-                            "grid size-4 place-items-center rounded-full border",
-                            done
-                              ? "border-primary bg-primary text-primary-foreground"
-                              : "border-muted-foreground/40",
-                          )}
-                        >
-                          {done && <Check className="size-3" />}
-                        </span>
-                        {label}
-                      </li>
-                    );
-                  },
-                )}
+                {(
+                  [
+                    "Treatment",
+                    "Travel date",
+                    "Patients being treated",
+                    "Companions coming along",
+                    "Nights in Batam",
+                  ] as const
+                ).map((label, i) => {
+                  const done = [
+                    !!session?.slots.treatmentId,
+                    !!session?.slots.date,
+                    session?.slots.patients != null,
+                    session?.slots.companions != null,
+                    session?.slots.nights != null,
+                  ][i];
+                  return (
+                    <li key={label} className="flex items-center gap-2">
+                      <span
+                        className={cn(
+                          "grid size-4 place-items-center rounded-full border",
+                          done
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-muted-foreground/40",
+                        )}
+                      >
+                        {done && <Check className="size-3" />}
+                      </span>
+                      {label}
+                    </li>
+                  );
+                })}
               </ul>
+            </div>
+          )}
+
+          {selections && (
+            <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-sm">
+              <div>
+                <p className="text-sm font-medium">Who is travelling?</p>
+                <p className="text-xs text-muted-foreground">
+                  Treatment is charged per patient. Companions only add ferry and transfer seats.
+                </p>
+              </div>
+              <Stepper
+                label="Patients being treated"
+                value={selections.patients}
+                min={1}
+                disabled={select.isPending || session?.stage === "BOOKED"}
+                onChange={(patients) => select.mutate({ patients })}
+              />
+              <Stepper
+                label="Companions (no treatment)"
+                value={selections.companions}
+                min={0}
+                disabled={select.isPending || session?.stage === "BOOKED"}
+                onChange={(companions) => select.mutate({ companions })}
+              />
+              <p className="text-xs text-muted-foreground">
+                Total travelling: <span className="font-medium text-foreground">
+                  {selections.patients + selections.companions}
+                </span>
+              </p>
             </div>
           )}
 
@@ -545,3 +584,50 @@ function OptionSwitcher({
   );
 }
 
+
+function Stepper({
+  label,
+  value,
+  min,
+  max = 20,
+  disabled,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max?: number;
+  disabled?: boolean;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <div className="flex items-center gap-1.5">
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="size-7"
+          disabled={disabled || value <= min}
+          aria-label={`Decrease ${label}`}
+          onClick={() => onChange(Math.max(min, value - 1))}
+        >
+          <Minus className="size-3.5" />
+        </Button>
+        <span className="w-6 text-center text-sm font-semibold">{value}</span>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="size-7"
+          disabled={disabled || value >= max}
+          aria-label={`Increase ${label}`}
+          onClick={() => onChange(Math.min(max, value + 1))}
+        >
+          <Plus className="size-3.5" />
+        </Button>
+      </div>
+    </div>
+  );
+}
