@@ -21,6 +21,17 @@ import {
 
 import { MedicalDisclaimer } from "@/components/hub/Disclaimer";
 import { Pill } from "@/components/hub/Pill";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -171,21 +182,38 @@ function ChatPage() {
                   ? "Plan ready"
                   : "Collecting details"}
             </Pill>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-xs"
-              disabled={reset.isPending}
-              onClick={() => reset.mutate()}
-              aria-label="Clear chat and start a new plan"
-            >
-              {reset.isPending ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <RotateCcw className="size-4" />
-              )}
-              Start over
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs"
+                  disabled={reset.isPending}
+                  aria-label="Clear chat and start a new plan"
+                >
+                  {reset.isPending ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <RotateCcw className="size-4" />
+                  )}
+                  Start over
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Start a new plan?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will clear your current chat and any selected plan. You can’t undo this.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => reset.mutate()}>
+                    Start over
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
 
 
