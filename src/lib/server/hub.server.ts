@@ -215,7 +215,7 @@ export function mapEvent(row: Row): AiActivityEvent {
     label: (row["message"] as string) || (row["event_type"] as string),
     state,
     durationMs: row["duration_ms"] === null || row["duration_ms"] === undefined ? null : Number(row["duration_ms"]),
-    detail: (row["metadata"] as Record<string, unknown> | null) ?? undefined,
+    detail: (row["metadata"] as AiActivityEvent["detail"]) ?? undefined,
   };
 }
 
