@@ -731,7 +731,7 @@ export async function bookFromChat(
     patientId = data["id"] as string;
   }
 
-  const summary = `${plan.treatment.name} in Batam on ${selections.date ?? "TBC"} for ${selections.travellers} traveller(s), ${selections.nights} night(s).`;
+  const summary = `${plan.treatment.name} in Batam on ${selections.date ?? "TBC"} for ${selections.patients} patient(s) + ${selections.companions} companion(s) (${selections.travellers} travellers), ${selections.nights} night(s).`;
 
   const { data: requestRow, error: requestError } = await sb
     .from("medical_requests")
