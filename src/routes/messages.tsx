@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 
 const searchSchema = z.object({
   patient: z.string().optional(),
-  channel: z.enum(["ALL", "WHATSAPP", "TELEGRAM"]).default("ALL"),
+  channel: z.enum(["ALL", "WHATSAPP", "TELEGRAM", "WEB"]).default("ALL"),
 });
 
 export const Route = createFileRoute("/messages")({
