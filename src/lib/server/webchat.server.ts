@@ -266,28 +266,42 @@ function fallback(catalogue: Row[], slots: ChatSlots, message: string): Extracti
     null;
 
   const dateMatch = /(\d{4}-\d{2}-\d{2})/.exec(message);
-  const peopleMatch =
-    /(\d+)\s*(people|person|persons|pax|traveller|travelers|travellers|of us)/.exec(lower);
+  const patientMatch = /(\d+)\s*(patient|patients|treatment for)/.exec(lower);
+  const companionMatch =
+    /(\d+)\s*(companion|companions|family member|family members|friend|friends|accompany|accompanying|coming with)/.exec(
+      lower,
+    );
   const nightsMatch = /(\d+)\s*(night|nights)/.exec(lower);
   const dayTrip = /day trip|same day|no hotel/.test(lower);
+  const alone = /just me|only me|by myself|alone|no one|nobody|none/.test(lower);
   const bareNumber = /^\s*(\d{1,2})\s*$/.exec(lower);
 
   const next: Extraction = {
     reply: "",
     treatment: match ? (match["name"] as string) : null,
     date: dateMatch?.[1] ?? null,
-    travellers: peopleMatch
-      ? Number(peopleMatch[1])
-      : slots.travellers === null && bareNumber
+    patients: patientMatch
+      ? Number(patientMatch[1])
+      : slots.patients === null && bareNumber
         ? Number(bareNumber[1])
-        : null,
+        : slots.patients === null && alone
+          ? 1
+          : null,
+    companions: companionMatch
+      ? Number(companionMatch[1])
+      : slots.patients !== null && slots.companions === null && bareNumber
+        ? Number(bareNumber[1])
+        : slots.patients !== null && slots.companions === null && alone
+          ? 0
+          : null,
     nights: nightsMatch ? Number(nightsMatch[1]) : dayTrip ? 0 : null,
     notes: null,
   };
 
   const treatment = next.treatment ?? slots.treatment;
   const date = next.date ?? slots.date;
-  const travellers = next.travellers ?? slots.travellers;
+  const patients = next.patients ?? slots.patients;
+  const companions = next.companions ?? slots.companions;
   const nights = next.nights ?? slots.nights;
 
   if (!treatment)
@@ -295,7 +309,11 @@ function fallback(catalogue: Row[], slots: ChatSlots, message: string): Extracti
       "Which treatment are you looking for? For example dental implants, LASIK or a health screening.";
   else if (!date)
     next.reply = `Great — ${treatment} in Batam. Which date would you like to travel? (e.g. 2026-09-12)`;
-  else if (travellers === null) next.reply = "How many people are travelling in total?";
+  else if (patients === null)
+    next.reply = "How many patients will be treated? (just you, or more people receiving treatment)";
+  else if (companions === null)
+    next.reply =
+      "How many companions are coming along without treatment? Say 0 if nobody is joining.";
   else if (nights === null)
     next.reply =
       "Would you like to stay overnight in Batam? Tell me how many nights, or say day trip.";
