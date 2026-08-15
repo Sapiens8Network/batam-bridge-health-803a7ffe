@@ -373,18 +373,20 @@ async function buildPlan(selections: ChatSelections): Promise<ChatPlan | null> {
     ? transportRows.find((t) => t["id"] === selections.transportId)
     : transportRows[0];
 
-  const travellers = Math.max(1, selections.travellers);
+  const patients = Math.max(1, selections.patients);
+  const companions = Math.max(0, selections.companions);
+  const travellers = patients + companions;
   const nights = Math.max(0, selections.nights);
   const ferryIncluded = selections.ferryId !== "NONE" && !!ferry;
   const hotelIncluded = nights > 0 && selections.hotelId !== "NONE" && !!hotel;
   const transportIncluded = selections.transportId !== "NONE" && !!transport;
 
   const breakdown: CostBreakdown = {
-    treatment: n(price?.["price_sgd"]) * travellers,
-    doctorFee: n(price?.["doctor_fee_sgd"]) * travellers,
-    hospitalFee: n(price?.["hospital_fee_sgd"]) * travellers,
-    diagnostics: n(price?.["diagnostics_sgd"]) * travellers,
-    medication: n(price?.["medication_sgd"]) * travellers,
+    treatment: n(price?.["price_sgd"]) * patients,
+    doctorFee: n(price?.["doctor_fee_sgd"]) * patients,
+    hospitalFee: n(price?.["hospital_fee_sgd"]) * patients,
+    diagnostics: n(price?.["diagnostics_sgd"]) * patients,
+    medication: n(price?.["medication_sgd"]) * patients,
     ferry: ferryIncluded ? n(ferry?.["estimated_cost_sgd"]) * travellers * 2 : 0,
     hotel: hotelIncluded ? n(hotel?.["price_per_night_sgd"]) * nights : 0,
     localTransport: transportIncluded ? n(transport?.["estimated_cost_sgd"]) * 2 : 0,
@@ -392,7 +394,7 @@ async function buildPlan(selections: ChatSelections): Promise<ChatPlan | null> {
   };
 
   const total = n(Object.values(breakdown).reduce((a, b) => a + b, 0));
-  const benchTreatment = n(benchmark?.["benchmark_average_sgd"]) * travellers;
+  const benchTreatment = n(benchmark?.["benchmark_average_sgd"]) * patients;
   const benchTotal = n(
     benchTreatment +
       n(benchmark?.["benchmark_travel_sgd"]) +
