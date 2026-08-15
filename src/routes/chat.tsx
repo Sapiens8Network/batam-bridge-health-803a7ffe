@@ -348,6 +348,7 @@ function ChatPage() {
 
                     {line.key === "hotel" && line.selected && plan.options.hotels.length > 1 && (
                       <OptionSwitcher
+                        label="Choose your hotel"
                         options={plan.options.hotels}
                         activeId={selections?.hotelId ?? plan.options.hotels[0]?.id ?? null}
                         onPick={(id) => select.mutate({ hotelId: id })}
@@ -356,6 +357,7 @@ function ChatPage() {
                     )}
                     {line.key === "ferry" && line.selected && plan.options.ferries.length > 1 && (
                       <OptionSwitcher
+                        label="Choose your ferry"
                         options={plan.options.ferries}
                         activeId={selections?.ferryId ?? plan.options.ferries[0]?.id ?? null}
                         onPick={(id) => select.mutate({ ferryId: id })}
@@ -364,17 +366,40 @@ function ChatPage() {
                     )}
                     {line.key === "treatment" && plan.options.hospitals.length > 1 && (
                       <OptionSwitcher
+                        label="Choose your hospital (base treatment price per patient)"
                         options={plan.options.hospitals}
                         activeId={selections?.hospitalId ?? plan.hospital.id}
                         onPick={(id) => select.mutate({ hospitalId: id })}
                       />
                     )}
+                    {line.key === "transport" &&
+                      line.selected &&
+                      plan.options.transports.length > 1 && (
+                        <OptionSwitcher
+                          label="Choose your transfer"
+                          options={plan.options.transports}
+                          activeId={
+                            selections?.transportId ?? plan.options.transports[0]?.id ?? null
+                          }
+                          onPick={(id) => select.mutate({ transportId: id })}
+                        />
+                      )}
                   </div>
                 ))}
               </div>
 
               <div className="rounded-xl bg-muted/60 p-4">
-                <div className="flex items-baseline justify-between">
+                <ul className="space-y-1 border-b pb-3 text-xs">
+                  {plan.lines
+                    .filter((l) => l.selected)
+                    .map((l) => (
+                      <li key={l.key} className="flex items-baseline justify-between gap-3">
+                        <span className="truncate text-muted-foreground">{l.label}</span>
+                        <span className="shrink-0 font-medium">{sgd(l.price)}</span>
+                      </li>
+                    ))}
+                </ul>
+                <div className="mt-3 flex items-baseline justify-between">
                   <span className="text-sm text-muted-foreground">Your total</span>
                   <span className="text-2xl font-semibold">{sgd(total)}</span>
                 </div>
@@ -388,6 +413,7 @@ function ChatPage() {
                   </p>
                 )}
               </div>
+
 
               {session?.stage === "BOOKED" ? (
                 <div className="space-y-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
