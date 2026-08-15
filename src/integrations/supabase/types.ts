@@ -915,6 +915,73 @@ export type Database = {
           },
         ]
       }
+      web_chat_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          itinerary_id: string | null
+          medical_request_id: string | null
+          patient_id: string | null
+          selections: Json
+          slots: Json
+          stage: string
+          token: string
+          transcript: Json
+          updated_at: string
+          visitor_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          itinerary_id?: string | null
+          medical_request_id?: string | null
+          patient_id?: string | null
+          selections?: Json
+          slots?: Json
+          stage?: string
+          token?: string
+          transcript?: Json
+          updated_at?: string
+          visitor_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          itinerary_id?: string | null
+          medical_request_id?: string | null
+          patient_id?: string | null
+          selections?: Json
+          slots?: Json
+          stage?: string
+          token?: string
+          transcript?: Json
+          updated_at?: string
+          visitor_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "web_chat_sessions_itinerary_id_fkey"
+            columns: ["itinerary_id"]
+            isOneToOne: false
+            referencedRelation: "itineraries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "web_chat_sessions_medical_request_id_fkey"
+            columns: ["medical_request_id"]
+            isOneToOne: false
+            referencedRelation: "medical_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "web_chat_sessions_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -930,7 +997,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "hospital_staff" | "doctor"
-      channel: "TELEGRAM" | "WHATSAPP"
+      channel: "TELEGRAM" | "WHATSAPP" | "WEB"
       item_status: "ESTIMATED" | "PENDING" | "CONFIRMED" | "COMPLETED"
       itinerary_status:
         | "DRAFT"
@@ -1095,7 +1162,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "hospital_staff", "doctor"],
-      channel: ["TELEGRAM", "WHATSAPP"],
+      channel: ["TELEGRAM", "WHATSAPP", "WEB"],
       item_status: ["ESTIMATED", "PENDING", "CONFIRMED", "COMPLETED"],
       itinerary_status: [
         "DRAFT",

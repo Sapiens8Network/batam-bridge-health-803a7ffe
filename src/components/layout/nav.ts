@@ -1,5 +1,6 @@
 import {
   Activity,
+  Bot,
   BarChart3,
   BedDouble,
   ClipboardList,
@@ -23,5 +24,6 @@ export const navItems = [
   { to: "/treatments", label: "Treatments & Pricing", icon: Tags },
   { to: "/logistics", label: "Hotels & Transport", icon: BedDouble },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
+  { to: "/chat", label: "Patient Web Chat", icon: Bot },
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
