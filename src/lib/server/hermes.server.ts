@@ -14,9 +14,6 @@ import {
   type CostResult,
 } from "./hub.server";
 
-const GATEWAY = "https://ai.gateway.lovable.dev/v1/responses";
-const MODEL = "openai/gpt-5.6-sol";
-
 export interface HermesExtraction {
   intent: "MEDICAL_TOURISM" | "GENERAL_ENQUIRY" | "FOLLOW_UP" | "UNCLEAR";
   treatment: string | null;
@@ -32,50 +29,15 @@ export interface HermesExtraction {
   patientSummary: string;
 }
 
-const SCHEMA = {
-  type: "object",
-  additionalProperties: false,
-  required: [
-    "intent",
-    "treatment",
-    "treatmentCategory",
-    "confidence",
-    "requirements",
-    "specialRequirements",
-    "travellers",
-    "nights",
-    "urgency",
-    "needsHuman",
-    "humanReasons",
-    "patientSummary",
-  ],
-  properties: {
-    intent: {
-      type: "string",
-      enum: ["MEDICAL_TOURISM", "GENERAL_ENQUIRY", "FOLLOW_UP", "UNCLEAR"],
-    },
-    treatment: { type: ["string", "null"] },
-    treatmentCategory: { type: ["string", "null"] },
-    confidence: { type: "number" },
-    requirements: { type: "array", items: { type: "string" } },
-    specialRequirements: { type: "array", items: { type: "string" } },
-    travellers: { type: "number" },
-    nights: { type: "number" },
-    urgency: { type: "string", enum: ["LOW", "NORMAL", "HIGH", "URGENT"] },
-    needsHuman: { type: "boolean" },
-    humanReasons: { type: "array", items: { type: "string" } },
-    patientSummary: { type: "string" },
-  },
-} as const;
-
-/** Streams the gateway response and returns the accumulated JSON text. */
+/** Calls the local Hermes agent over a standard OpenAI-style endpoint. */
 async function callHermes(catalogue: string[], message: string): Promise<HermesExtraction | null> {
-  const apiKey = process.env["LOVABLE_API_KEY"];
-  if (!apiKey) return null;
+  const hermesUrl = process.env["HERMES_URL"];
+  const apiKey = process.env["HERMES_API_KEY"];
+  if (!hermesUrl || !apiKey) return null;
 
   const instructions = [
     "You are Hermes, the medical-tourism triage agent for MedBridge Pass.",
-    "Singapore patients message on WhatsApp/Telegram about treatment in Batam, Indonesia.",
+    "Singapore patients message about treatment in Batam, Indonesia.",
     "Classify the enquiry into structured fields only. Never invent prices, dates, doctors or clinical advice.",
     `Pick "treatment" EXACTLY from this catalogue or return null: ${catalogue.join(" | ")}.`,
     "Set needsHuman = true when the request is clinically complex, mentions emergencies, minors, pregnancy,",
@@ -84,64 +46,37 @@ async function callHermes(catalogue: string[], message: string): Promise<HermesE
     "patientSummary = one short neutral sentence for hospital staff.",
   ].join(" ");
 
-  const res = await fetch(GATEWAY, {
+  const res = await fetch(`${hermesUrl}/chat/completions`, {
     method: "POST",
     headers: {
+      Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
-      "Lovable-API-Key": apiKey,
-      "X-Lovable-AIG-SDK": "fetch",
+      "Bypass-Tunnel-Reminder": "true",
     },
     body: JSON.stringify({
-      model: MODEL,
-      instructions,
-      input: [{ role: "user", content: [{ type: "input_text", text: message }] }],
-      stream: true,
-      store: false,
-      text: { format: { type: "json_schema", name: "triage", strict: true, schema: SCHEMA } },
+      model: "hermes-agent",
+      messages: [
+        { role: "system", content: instructions },
+        { role: "user", content: message },
+      ],
+      response_format: { type: "json_object" },
     }),
   });
 
-  if (!res.ok || !res.body) {
-    console.error("Hermes gateway error", res.status, await res.text().catch(() => ""));
+  if (!res.ok) {
+    console.error("Hermes local agent error", res.status, await res.text().catch(() => ""));
     return null;
   }
 
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
-  let text = "";
-  while (true) {
-    const chunk = await reader.read();
-    if (chunk.done) break;
-    buffer += decoder.decode(chunk.value, { stream: true });
-    const lines = buffer.split("\n");
-    buffer = lines.pop() ?? "";
-    for (const line of lines) {
-      if (!line.startsWith("data:")) continue;
-      const payload = line.slice(5).trim();
-      if (!payload || payload === "[DONE]") continue;
-      try {
-        const event = JSON.parse(payload) as {
-          type?: string;
-          delta?: string;
-          response?: { output_text?: string };
-        };
-        if (event.type === "response.output_text.delta" && typeof event.delta === "string")
-          text += event.delta;
-        if (event.type === "response.completed" && !text && event.response?.output_text) {
-          text = event.response.output_text;
-        }
-      } catch {
-        /* ignore keep-alive frames */
-      }
-    }
-  }
-
-  if (!text.trim()) return null;
   try {
-    return JSON.parse(text) as HermesExtraction;
-  } catch {
-    console.error("Hermes returned non-JSON output");
+    const json = (await res.json()) as {
+      choices?: { message?: { content?: string } }[];
+    };
+    const content = json.choices?.[0]?.message?.content;
+    if (!content) return null;
+    return JSON.parse(content) as HermesExtraction;
+  } catch (err) {
+    console.error("Hermes local agent parse error", err);
     return null;
   }
 }
