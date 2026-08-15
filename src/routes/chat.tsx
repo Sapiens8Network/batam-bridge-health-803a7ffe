@@ -11,6 +11,8 @@ import {
   Loader2,
   Minus,
   Plus,
+  RotateCcw,
+
   Send,
   Ship,
   Sparkles,
@@ -104,6 +106,21 @@ function ChatPage() {
     onSuccess: setSession,
   });
 
+  const reset = useMutation({
+    mutationFn: async () => {
+      window.localStorage.removeItem(STORAGE_KEY);
+      return startFn({ data: {} });
+    },
+    onSuccess: (payload) => {
+      window.localStorage.setItem(STORAGE_KEY, payload.token);
+      setSession(payload);
+      setDraft("");
+      setName("");
+      setPhone("");
+    },
+  });
+
+
   const submit = (text: string) => {
     const value = text.trim();
     if (!value || send.isPending) return;
@@ -154,7 +171,23 @@ function ChatPage() {
                   ? "Plan ready"
                   : "Collecting details"}
             </Pill>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs"
+              disabled={reset.isPending}
+              onClick={() => reset.mutate()}
+              aria-label="Clear chat and start a new plan"
+            >
+              {reset.isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <RotateCcw className="size-4" />
+              )}
+              Start over
+            </Button>
           </div>
+
 
           <div ref={scroller} className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
             {!session && (
