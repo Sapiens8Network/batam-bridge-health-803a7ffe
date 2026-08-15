@@ -29,13 +29,13 @@ export const Route = createFileRoute("/messages")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Unified Messaging Centre · Health Tourism Hub" },
+      { title: "Unified Messaging Centre · MedBridge Pass" },
       {
         name: "description",
         content:
           "One inbox for WhatsApp and Telegram patient conversations, with editable AI-suggested replies and hospital takeover.",
       },
-      { property: "og:title", content: "Unified Messaging Centre · Health Tourism Hub" },
+      { property: "og:title", content: "Unified Messaging Centre · MedBridge Pass" },
       { property: "og:description", content: "Handle Singapore patient conversations across WhatsApp and Telegram." },
     ],
   }),

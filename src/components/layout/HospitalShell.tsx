@@ -84,7 +84,7 @@ function Brand() {
         <HeartPulse className="size-4.5" />
       </span>
       <span className="min-w-0">
-        <span className="block truncate text-sm font-semibold text-sidebar-foreground">Health Tourism Hub</span>
+        <span className="block truncate text-sm font-semibold text-sidebar-foreground">MedBridge Pass</span>
         <span className="block truncate text-[10px] text-sidebar-foreground/60">Singapore ↔ Batam</span>
       </span>
     </Link>

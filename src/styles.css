@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Health Tourism Hub design system.
+ * MedBridge Pass design system.
  * Journey metaphor: cool "city of light" blue (Singapore) -> healthy green (Batam nature/care).
  * All colors are semantic tokens in oklch. Never hardcode color utilities in components.
  */

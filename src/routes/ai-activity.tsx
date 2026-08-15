@@ -14,13 +14,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/ai-activity")({
   head: () => ({
     meta: [
-      { title: "AI Agent Activity · Health Tourism Hub" },
+      { title: "AI Agent Activity · MedBridge Pass" },
       {
         name: "description",
         content:
           "Real-time workflow events from the orchestration backend: treatment identification, pricing retrieval, itinerary generation and review flags.",
       },
-      { property: "og:title", content: "AI Agent Activity · Health Tourism Hub" },
+      { property: "og:title", content: "AI Agent Activity · MedBridge Pass" },
       { property: "og:description", content: "Audit the structured AI workflow behind every patient proposal." },
     ],
   }),

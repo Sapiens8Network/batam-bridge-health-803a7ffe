@@ -13,12 +13,12 @@ import { inquiryStatusMeta } from "@/lib/status";
 export const Route = createFileRoute("/patients/")({
   head: () => ({
     meta: [
-      { title: "Singapore Patients · Health Tourism Hub" },
+      { title: "Singapore Patients · MedBridge Pass" },
       {
         name: "description",
         content: "Directory of Singapore patients travelling to Batam, their channels, preferred dates and case status.",
       },
-      { property: "og:title", content: "Singapore Patients · Health Tourism Hub" },
+      { property: "og:title", content: "Singapore Patients · MedBridge Pass" },
       { property: "og:description", content: "Manage cross-border patient records and case history." },
     ],
   }),

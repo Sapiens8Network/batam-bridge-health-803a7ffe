@@ -22,13 +22,13 @@ import { inquiryStatusMeta, priorityMeta } from "@/lib/status";
 export const Route = createFileRoute("/inquiries/$id")({
   head: () => ({
     meta: [
-      { title: "Inquiry Detail · Health Tourism Hub" },
+      { title: "Inquiry Detail · MedBridge Pass" },
       {
         name: "description",
         content:
           "Structured patient request, AI-extracted treatment data, cost comparison, quote builder and doctor review for a single inquiry.",
       },
-      { property: "og:title", content: "Inquiry Detail · Health Tourism Hub" },
+      { property: "og:title", content: "Inquiry Detail · MedBridge Pass" },
       { property: "og:description", content: "Review and approve a cross-border medical travel proposal." },
     ],
   }),

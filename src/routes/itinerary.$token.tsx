@@ -26,13 +26,13 @@ import { confirmationMeta } from "@/lib/status";
 export const Route = createFileRoute("/itinerary/$token")({
   head: () => ({
     meta: [
-      { title: "Your Batam Care Journey · Health Tourism Hub" },
+      { title: "Your Batam Care Journey · MedBridge Pass" },
       {
         name: "description",
         content:
           "Your hospital-approved medical travel itinerary: ferry times, appointment, recovery stay and a full cost breakdown in SGD.",
       },
-      { property: "og:title", content: "Your Batam Care Journey · Health Tourism Hub" },
+      { property: "og:title", content: "Your Batam Care Journey · MedBridge Pass" },
       {
         property: "og:description",
         content: "Hospital-approved treatment, travel and recovery plan with transparent Singapore-comparison pricing.",
@@ -89,7 +89,7 @@ function PatientItineraryPage() {
   return (
     <main className="min-h-screen bg-background pb-16">
       <header className="journey-gradient px-5 pb-8 pt-10 text-white">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/80">Health Tourism Hub</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/80">MedBridge Pass</p>
         <h1 className="mt-2 text-2xl font-semibold leading-tight">Your Batam care journey</h1>
         <p className="mt-1 text-sm text-white/85">
           {data.patientName} · {data.treatment}

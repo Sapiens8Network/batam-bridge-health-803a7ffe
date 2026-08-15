@@ -1,5 +1,5 @@
 /**
- * Server-only backend for Health Tourism Hub.
+ * Server-only backend for MedBridge Pass.
  *
  * Everything that touches the database, the Hermes AI agent or the messaging
  * providers lives here. The frontend never sees this module: it only consumes

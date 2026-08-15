@@ -22,13 +22,13 @@ import { pct, sgd } from "@/lib/format";
 export const Route = createFileRoute("/analytics")({
   head: () => ({
     meta: [
-      { title: "Analytics & Conversion · Health Tourism Hub" },
+      { title: "Analytics & Conversion · MedBridge Pass" },
       {
         name: "description",
         content:
           "Inquiry volume, AI response times, treatment demand, conversion funnel and estimated patient savings across Singapore-Batam cases.",
       },
-      { property: "og:title", content: "Analytics & Conversion · Health Tourism Hub" },
+      { property: "og:title", content: "Analytics & Conversion · MedBridge Pass" },
       { property: "og:description", content: "Performance metrics for cross-border medical travel operations." },
     ],
   }),

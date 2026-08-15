@@ -18,13 +18,13 @@ import { inquiryStatusMeta, pipelineOrder, priorityMeta, reviewMeta } from "@/li
 export const Route = createFileRoute("/inquiries/")({
   head: () => ({
     meta: [
-      { title: "Live Inquiry Pipeline · Health Tourism Hub" },
+      { title: "Live Inquiry Pipeline · MedBridge Pass" },
       {
         name: "description",
         content:
           "Kanban and table views of every Singapore patient inquiry from AI processing through hospital approval and confirmed Batam booking.",
       },
-      { property: "og:title", content: "Live Inquiry Pipeline · Health Tourism Hub" },
+      { property: "og:title", content: "Live Inquiry Pipeline · MedBridge Pass" },
       { property: "og:description", content: "Track every cross-border patient inquiry through the approval workflow." },
     ],
   }),

@@ -71,7 +71,7 @@ async function callHermes(catalogue: string[], message: string): Promise<HermesE
   if (!apiKey) return null;
 
   const instructions = [
-    "You are Hermes, the medical-tourism triage agent for Health Tourism Hub.",
+    "You are Hermes, the medical-tourism triage agent for MedBridge Pass.",
     "Singapore patients message on WhatsApp/Telegram about treatment in Batam, Indonesia.",
     "Classify the enquiry into structured fields only. Never invent prices, dates, doctors or clinical advice.",
     `Pick "treatment" EXACTLY from this catalogue or return null: ${catalogue.join(" | ")}.`,
@@ -301,7 +301,7 @@ export async function processInbound(input: InboundInput): Promise<{ inquiryId: 
       requestId,
       channel: input.channel,
       author: "AI",
-      text: "Thanks for reaching out to Health Tourism Hub. A care coordinator is reviewing your request personally and will reply shortly.",
+      text: "Thanks for reaching out to MedBridge Pass. A care coordinator is reviewing your request personally and will reply shortly.",
     });
     return { inquiryId: requestId };
   }
