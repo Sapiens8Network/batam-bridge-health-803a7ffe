@@ -167,12 +167,13 @@ function selectionsOf(row: Row, slots: ChatSlots): ChatSelections {
 const SCHEMA = {
   type: "object",
   additionalProperties: false,
-  required: ["reply", "treatment", "date", "travellers", "nights", "notes"],
+  required: ["reply", "treatment", "date", "patients", "companions", "nights", "notes"],
   properties: {
     reply: { type: "string" },
     treatment: { type: ["string", "null"] },
     date: { type: ["string", "null"] },
-    travellers: { type: ["number", "null"] },
+    patients: { type: ["number", "null"] },
+    companions: { type: ["number", "null"] },
     nights: { type: ["number", "null"] },
     notes: { type: ["string", "null"] },
   },
@@ -182,7 +183,8 @@ interface Extraction {
   reply: string;
   treatment: string | null;
   date: string | null;
-  travellers: number | null;
+  patients: number | null;
+  companions: number | null;
   nights: number | null;
   notes: string | null;
 }
@@ -202,7 +204,8 @@ async function extract(
     "Never quote prices, never give clinical advice, never promise availability — the system prices the trip from the hospital database.",
     `Match "treatment" EXACTLY to one of: ${catalogue.join(" | ")}. Use null when unsure.`,
     "date = ISO yyyy-mm-dd when the patient names a date, otherwise null. nights = hotel nights in Batam (0 for day trip).",
-    "Ask for exactly one missing variable at a time, in this order: treatment, date, travellers, nights.",
+    "patients = how many people actually receive the treatment (minimum 1). companions = how many accompanying people travel along without treatment (0 when travelling alone). Never merge the two numbers.",
+    "Ask for exactly one missing variable at a time, in this order: treatment, date, patients, companions, nights.",
     `Already collected: ${JSON.stringify(slots)}. When everything is collected, confirm briefly that the plan is ready below.`,
   ].join(" ");
 
