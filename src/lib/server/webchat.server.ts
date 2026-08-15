@@ -549,8 +549,9 @@ function toPayload(row: Row, plan: ChatPlan | null): ChatSessionPayload {
 
 async function planFor(row: Row): Promise<ChatPlan | null> {
   const slots = slotsOf(row);
-  if (!slots.treatmentId || !slots.date || slots.travellers === null || slots.nights === null)
-    return null;
+  const hasPeople =
+    (slots.patients !== null && slots.companions !== null) || slots.travellers !== null;
+  if (!slots.treatmentId || !slots.date || !hasPeople || slots.nights === null) return null;
   return buildPlan(selectionsOf(row, slots));
 }
 
