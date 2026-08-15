@@ -4,6 +4,8 @@
  * structured fields, events and statuses.
  */
 
+export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
 export type Channel = "WHATSAPP" | "TELEGRAM";
 
 export type InquiryStatus =
@@ -100,7 +102,7 @@ export interface AiActivityEvent {
   label: string;
   state: "DONE" | "RUNNING" | "ATTENTION" | "FAILED";
   durationMs: number | null;
-  detail?: Record<string, unknown> | undefined;
+  detail?: Record<string, JsonValue> | undefined;
 }
 
 export interface ItineraryStep {

@@ -1,21 +1,39 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import { supabase } from "@/integrations/supabase/client";
+
 import { api } from "../api";
-import { useHub } from "../mock/store";
+import { useUi } from "../ui-store";
 
 /**
- * Realtime bridge. In mock mode the in-memory store plays the role of the
- * WebSocket/SSE feed: every mutation bumps `version`, and we invalidate the
- * query cache so all screens update live. Replace `subscribeLive` with a real
- * socket subscription and the rest of the app is unchanged.
+ * Realtime bridge. The backend writes to the database, Postgres pushes the
+ * change over the realtime socket and the query cache is invalidated, so every
+ * dashboard screen updates live. The frontend never receives raw AI output.
  */
 export function subscribeLive(queryClient: QueryClient) {
-  return useHub.subscribe((state, prev) => {
-    if (state.version !== prev.version) {
+  const channel = supabase
+    .channel("hub-live")
+    .on("postgres_changes", { event: "*", schema: "public", table: "medical_requests" }, () => {
       void queryClient.invalidateQueries();
-    }
-  });
+    })
+    .on("postgres_changes", { event: "*", schema: "public", table: "itineraries" }, () => {
+      void queryClient.invalidateQueries();
+    })
+    .on("postgres_changes", { event: "*", schema: "public", table: "quotes" }, () => {
+      void queryClient.invalidateQueries();
+    })
+    .on("postgres_changes", { event: "*", schema: "public", table: "ai_activity_events" }, () => {
+      void queryClient.invalidateQueries();
+    })
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, () => {
+      void queryClient.invalidateQueries();
+    })
+    .subscribe();
+
+  return () => {
+    void supabase.removeChannel(channel);
+  };
 }
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -28,14 +46,15 @@ export function playInboundChime() {
   try {
     const Ctor = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (!Ctor) return;
-    notificationCtx = notificationCtx ?? new Ctor();
+    notificationCtx ??= new Ctor();
     const ctx = notificationCtx;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = "sine";
-    osc.frequency.value = 880;
+    osc.frequency.setValueAtTime(660, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(990, ctx.currentTime + 0.18);
     gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.05, ctx.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.06, ctx.currentTime + 0.04);
     gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
     osc.connect(gain).connect(ctx.destination);
     osc.start();
@@ -45,23 +64,15 @@ export function playInboundChime() {
   }
 }
 
-/** Simulated inbound webhook — the seam where the real backend webhook plugs in. */
+/** Pushes a message through the same backend pipeline the real webhooks use. */
 export async function simulateInboundMessage(input: {
   name: string;
   channel: "WHATSAPP" | "TELEGRAM";
   message: string;
-  treatmentId?: string;
   chime?: boolean;
 }) {
-  const payload = {
-    name: input.name,
-    message: input.message,
-    ...(input.treatmentId !== undefined ? { treatmentId: input.treatmentId } : {}),
-  };
+  const payload = { name: input.name, message: input.message };
   const res = input.channel === "TELEGRAM" ? await api.webhookTelegram(payload) : await api.webhookWhatsapp(payload);
-  const hub = useHub.getState();
-  hub.pushActivity(res.inquiryId, "Message received", "DONE", 120, { channel: input.channel });
-  hub.pushFeed(`New ${input.channel === "TELEGRAM" ? "Telegram" : "WhatsApp"} inquiry · ${input.name}`, "INFO", res.inquiryId);
   if (input.chime !== false) playInboundChime();
   toast.success(`New ${input.channel === "TELEGRAM" ? "Telegram" : "WhatsApp"} inquiry`, {
     description: `${input.name} · ${input.message.slice(0, 70)}…`,
@@ -70,98 +81,50 @@ export async function simulateInboundMessage(input: {
 }
 
 const DEMO_MESSAGE =
-  "I'm from Singapore and need a dental implant. Can you tell me the complete cost including ferry and hotel?";
+  "I'm from Singapore and need a dental implant. Can you tell me the complete cost including ferry and hotel? Travelling alone for 2 nights.";
 
-/** Scripted 60-90s end-to-end demonstration driven through the same event path. */
+/**
+ * End-to-end demonstration. Every step is a real backend call: Hermes triage,
+ * cost engine, hospital approval, patient delivery and patient confirmation.
+ */
 export async function runLiveDemo(onInquiry?: (inquiryId: string) => void) {
-  const hub = useHub.getState();
-  if (hub.demoRunning) return;
-  hub.setDemo(true);
+  const ui = useUi.getState();
+  if (ui.demoRunning) return;
+  ui.setDemo(true, null);
 
   try {
+    toast.info("Inbound Telegram message received", { description: "Hermes is triaging the request…" });
     const inquiryId = await simulateInboundMessage({
       name: "Joel Mahendran",
       channel: "TELEGRAM",
       message: DEMO_MESSAGE,
-      treatmentId: "trt_dental_implant",
     });
-    useHub.getState().setDemo(true, inquiryId);
+    useUi.getState().setDemo(true, inquiryId);
     onInquiry?.(inquiryId);
 
-    const s = () => useHub.getState();
-    const beat = async (
-      ms: number,
-      label: string,
-      fn?: () => void,
-      tone: "INFO" | "SUCCESS" | "ATTENTION" = "INFO",
-    ) => {
-      await wait(ms);
-      fn?.();
-      s().pushFeed(label, tone, inquiryId);
-    };
-
-    await beat(2500, "AI processing inquiry", () => {
-      s().setInquiryStatus(inquiryId, "AI_PROCESSING");
-      s().pushActivity(inquiryId, "Patient identified", "DONE", 340);
-    });
-    await beat(4000, "Treatment identified: Dental Implant", () =>
-      s().pushActivity(inquiryId, "Treatment identified", "DONE", 910, {
-        treatment: "Dental Implant",
-        confidence: 0.94,
-      }),
-    );
-    await beat(4000, "Treatment pricing retrieved", () => {
-      s().pushActivity(inquiryId, "Treatment database searched", "DONE", 210);
-      s().pushActivity(inquiryId, "Batam price retrieved", "DONE", 160, { treatmentSgd: 400 });
-    });
-    await beat(4500, "Singapore comparison calculated", () =>
-      s().pushActivity(inquiryId, "Singapore benchmark retrieved", "DONE", 180, { benchmarkSgd: 1800 }),
-    );
-    await beat(4500, "Travel estimate generated", () => {
-      s().pushActivity(inquiryId, "Travel estimate calculated", "DONE", 240, { ferrySgd: 75 });
-      s().pushActivity(inquiryId, "Hotel estimate calculated", "DONE", 190, { nights: 1, nightlySgd: 65 });
-    });
-    await beat(
-      5000,
-      "Itinerary generated",
-      () => {
-        s().pushActivity(inquiryId, "Itinerary generated", "DONE", 1450, { steps: 6 });
-        s().setInquiryStatus(inquiryId, "AI_ITINERARY_READY");
-      },
-      "SUCCESS",
-    );
-    await beat(
-      4000,
-      "Hospital review required",
-      () => {
-        s().pushActivity(inquiryId, "Hospital review required", "ATTENTION", null, {
-          reasons: ["Hospital confirmation of pricing and availability"],
-        });
-        s().setInquiryStatus(inquiryId, "HOSPITAL_REVIEW_REQUIRED");
-        toast.warning("Hospital review required", { description: "Dental Implant package awaiting confirmation." });
-      },
-      "ATTENTION",
-    );
-
-    await wait(6000);
-    const inquiry = s().inquiries.find((i) => i.id === inquiryId);
-    if (inquiry) {
-      await api.quoteAction(inquiry.quoteId, { action: "APPROVE" });
-      toast.success("Quote approved by hospital");
+    await wait(1500);
+    const view = await api.inquiry(inquiryId);
+    if (view.inquiry.humanTakeover.active || !view.itinerary) {
+      toast.warning("Case escalated to a coordinator", {
+        description: view.inquiry.humanTakeover.reasons[0] ?? "Hermes could not complete this case automatically.",
+      });
+      return;
     }
 
-    await wait(5000);
-    const itinerary = s().itineraries.find((i) => i.inquiryId === inquiryId);
-    if (itinerary) {
-      await api.sendItinerary(itinerary.id);
-      toast.success("Patient notified on Telegram", { description: "Itinerary link delivered." });
-    }
+    toast.success("Itinerary generated", {
+      description: `${view.inquiry.aiRequest.treatment} · awaiting hospital confirmation`,
+    });
 
-    await wait(3000);
-    s().setInquiryStatus(inquiryId, "TRAVEL_READY");
-    s().pushFeed("Patient itinerary ready", "SUCCESS", inquiryId);
-    toast.success("Patient itinerary ready", { description: "Open the itinerary to view the patient view." });
+    await wait(3500);
+    await api.quoteAction(view.itinerary.id, { action: "APPROVE" });
+    toast.success("Quote approved by hospital");
+
+    await wait(2500);
+    await api.sendItinerary(view.itinerary.id);
+    toast.success("Patient notified on Telegram", { description: "Itinerary link delivered." });
+  } catch (error) {
+    toast.error("Demo could not complete", { description: error instanceof Error ? error.message : "Unknown error" });
   } finally {
-    useHub.getState().setDemo(false);
+    useUi.getState().setDemo(false);
   }
 }
