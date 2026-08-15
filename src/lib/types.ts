@@ -35,7 +35,7 @@ export interface Patient {
   preferredDate: string;
   createdAt: string;
   language: string;
-  notes?: string;
+  notes?: string | undefined;
 }
 
 export interface AiExtractedRequest {
@@ -100,7 +100,7 @@ export interface AiActivityEvent {
   label: string;
   state: "DONE" | "RUNNING" | "ATTENTION" | "FAILED";
   durationMs: number | null;
-  detail?: Record<string, unknown>;
+  detail?: Record<string, unknown> | undefined;
 }
 
 export interface ItineraryStep {
@@ -150,8 +150,8 @@ export interface Message {
   author: MessageAuthor;
   body: string;
   at: string;
-  suggested?: boolean;
-  sent?: boolean;
+  suggested?: boolean | undefined;
+  sent?: boolean | undefined;
 }
 
 export interface Hospital {
@@ -214,7 +214,7 @@ export interface ActivityFeedItem {
   at: string;
   label: string;
   tone: "INFO" | "SUCCESS" | "ATTENTION";
-  inquiryId?: string;
+  inquiryId?: string | undefined;
 }
 
 export interface QuoteTotals {
