@@ -37,7 +37,9 @@ export function Field({
 }) {
   return (
     <div className={cn("min-w-0", className)}>
-      <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{label}</dt>
+      <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </dt>
       <dd className="mt-0.5 truncate text-sm font-medium text-foreground">{value}</dd>
     </div>
   );
@@ -49,7 +51,10 @@ export function ConfidenceBar({ value }: { value: number }) {
   return (
     <div className="flex items-center gap-2">
       <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
-        <div className={cn("h-full rounded-full", dotClass[tone])} style={{ width: `${percent}%` }} />
+        <div
+          className={cn("h-full rounded-full", dotClass[tone])}
+          style={{ width: `${percent}%` }}
+        />
       </div>
       <span className="text-xs font-semibold tabular-nums text-foreground">{percent}%</span>
     </div>

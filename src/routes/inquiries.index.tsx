@@ -9,7 +9,14 @@ import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/hub/StateBloc
 import { HospitalShell, PageHeader } from "@/components/layout/HospitalShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { inquiriesQuery } from "@/lib/api/queries";
 import { pct, sgd } from "@/lib/format";
 import { quoteTotals } from "@/lib/quote-math";
@@ -25,7 +32,10 @@ export const Route = createFileRoute("/inquiries/")({
           "Kanban and table views of every Singapore patient inquiry from AI processing through hospital approval and confirmed Batam booking.",
       },
       { property: "og:title", content: "Live Inquiry Pipeline · MedBridge Pass" },
-      { property: "og:description", content: "Track every cross-border patient inquiry through the approval workflow." },
+      {
+        property: "og:description",
+        content: "Track every cross-border patient inquiry through the approval workflow.",
+      },
     ],
   }),
   component: InquiriesPage,
@@ -49,7 +59,11 @@ function InquiriesPage() {
 
   const columns = pipelineOrder
     .map((status) => ({ status, items: filtered.filter((v) => v.inquiry.status === status) }))
-    .filter((c) => c.items.length > 0 || ["NEW_INQUIRY", "HOSPITAL_REVIEW_REQUIRED", "QUOTE_APPROVED"].includes(c.status));
+    .filter(
+      (c) =>
+        c.items.length > 0 ||
+        ["NEW_INQUIRY", "HOSPITAL_REVIEW_REQUIRED", "QUOTE_APPROVED"].includes(c.status),
+    );
 
   return (
     <HospitalShell>
@@ -91,7 +105,10 @@ function InquiriesPage() {
       ) : isError ? (
         <ErrorBlock onRetry={() => void refetch()} />
       ) : filtered.length === 0 ? (
-        <EmptyBlock title="No inquiries match" description="Adjust your filter or wait for the next inbound message." />
+        <EmptyBlock
+          title="No inquiries match"
+          description="Adjust your filter or wait for the next inbound message."
+        />
       ) : view === "kanban" ? (
         <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-3">
           {columns.map((column) => {
@@ -104,7 +121,9 @@ function InquiriesPage() {
                       {meta.short}
                     </Pill>
                   </div>
-                  <span className="text-xs font-semibold tabular-nums text-muted-foreground">{column.items.length}</span>
+                  <span className="text-xs font-semibold tabular-nums text-muted-foreground">
+                    {column.items.length}
+                  </span>
                 </header>
                 <div className="space-y-2">
                   {column.items.map((v) => (
@@ -146,7 +165,11 @@ function InquiriesPage() {
                 return (
                   <TableRow key={v.inquiry.id}>
                     <TableCell>
-                      <Link to="/inquiries/$id" params={{ id: v.inquiry.id }} className="font-medium hover:underline">
+                      <Link
+                        to="/inquiries/$id"
+                        params={{ id: v.inquiry.id }}
+                        className="font-medium hover:underline"
+                      >
                         {v.patient.name}
                       </Link>
                       <span className="block text-[11px] text-muted-foreground">
@@ -168,8 +191,12 @@ function InquiriesPage() {
                     <TableCell>
                       <ConfidenceBar value={v.inquiry.aiRequest.confidence} />
                     </TableCell>
-                    <TableCell className="text-right tabular-nums text-singapore">{sgd(totals.benchmarkTotal)}</TableCell>
-                    <TableCell className="text-right tabular-nums text-batam">{sgd(totals.packageTotal)}</TableCell>
+                    <TableCell className="text-right tabular-nums text-singapore">
+                      {sgd(totals.benchmarkTotal)}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums text-batam">
+                      {sgd(totals.packageTotal)}
+                    </TableCell>
                     <TableCell className="text-right tabular-nums font-medium text-success">
                       {sgd(totals.savings)} · {pct(totals.savingsPct, 0)}
                     </TableCell>

@@ -1,5 +1,14 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Bell, Bot, HeartPulse, Menu, Search, Send, MessageSquare, ChevronsUpDown } from "lucide-react";
+import {
+  Bell,
+  Bot,
+  HeartPulse,
+  Menu,
+  Search,
+  Send,
+  MessageSquare,
+  ChevronsUpDown,
+} from "lucide-react";
 import { useState } from "react";
 
 import { navItems } from "@/components/layout/nav";
@@ -53,21 +62,38 @@ function SidebarStatus() {
   const hospital = hospitals.find((h) => h.id === activeHospitalId) ?? hospitals[0];
   const rows = [
     { label: "AI Agent", value: connections.ai ? "ONLINE" : "OFFLINE", ok: connections.ai },
-    { label: "WhatsApp", value: connections.whatsapp ? "CONNECTED" : "DISCONNECTED", ok: connections.whatsapp },
-    { label: "Telegram", value: connections.telegram ? "CONNECTED" : "DISCONNECTED", ok: connections.telegram },
+    {
+      label: "WhatsApp",
+      value: connections.whatsapp ? "CONNECTED" : "DISCONNECTED",
+      ok: connections.whatsapp,
+    },
+    {
+      label: "Telegram",
+      value: connections.telegram ? "CONNECTED" : "DISCONNECTED",
+      ok: connections.telegram,
+    },
   ];
   return (
     <div className="space-y-2 border-t border-sidebar-border px-4 py-3">
       <div>
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-sidebar-foreground/60">Hospital</p>
-        <p className="truncate text-sm font-semibold text-sidebar-foreground">{hospital?.name ?? "Loading…"}</p>
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-sidebar-foreground/60">
+          Hospital
+        </p>
+        <p className="truncate text-sm font-semibold text-sidebar-foreground">
+          {hospital?.name ?? "Loading…"}
+        </p>
       </div>
       <dl className="space-y-1">
         {rows.map((row) => (
           <div key={row.label} className="flex items-center justify-between gap-2 text-[11px]">
             <dt className="text-sidebar-foreground/60">{row.label}</dt>
             <dd className="flex items-center gap-1.5 font-semibold text-sidebar-foreground">
-              <span className={cn("size-1.5 rounded-full", row.ok ? "bg-sidebar-primary" : "bg-destructive")} />
+              <span
+                className={cn(
+                  "size-1.5 rounded-full",
+                  row.ok ? "bg-sidebar-primary" : "bg-destructive",
+                )}
+              />
               {row.value}
             </dd>
           </div>
@@ -79,13 +105,20 @@ function SidebarStatus() {
 
 function Brand() {
   return (
-    <Link to="/dashboard" className="flex items-center gap-2.5 border-b border-sidebar-border px-4 py-4">
+    <Link
+      to="/dashboard"
+      className="flex items-center gap-2.5 border-b border-sidebar-border px-4 py-4"
+    >
       <span className="journey-gradient flex size-8 items-center justify-center rounded-lg text-primary-foreground">
         <HeartPulse className="size-4.5" />
       </span>
       <span className="min-w-0">
-        <span className="block truncate text-sm font-semibold text-sidebar-foreground">MedBridge Pass</span>
-        <span className="block truncate text-[10px] text-sidebar-foreground/60">Singapore ↔ Batam</span>
+        <span className="block truncate text-sm font-semibold text-sidebar-foreground">
+          MedBridge Pass
+        </span>
+        <span className="block truncate text-[10px] text-sidebar-foreground/60">
+          Singapore ↔ Batam
+        </span>
       </span>
     </Link>
   );
@@ -184,7 +217,9 @@ function TopBar() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>
               Aisha Idris
-              <span className="block text-[11px] font-normal text-muted-foreground">Patient coordinator</span>
+              <span className="block text-[11px] font-normal text-muted-foreground">
+                Patient coordinator
+              </span>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
@@ -226,7 +261,9 @@ export function PageHeader({
   return (
     <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">{title}</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+          {title}
+        </h1>
         {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
       </div>
       {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}

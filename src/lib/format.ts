@@ -14,10 +14,10 @@ export const clock = (iso: string) =>
 export const dateShort = (iso: string) =>
   new Date(iso).toLocaleDateString("en-SG", { day: "2-digit", month: "short" });
 
-export const dateTime = (iso: string) =>
-  `${dateShort(iso)} · ${clock(iso)}`;
+export const dateTime = (iso: string) => `${dateShort(iso)} · ${clock(iso)}`;
 
-export const duration = (ms: number | null) => (ms === null ? "—" : ms < 1000 ? `${ms} ms` : `${(ms / 1000).toFixed(1)} s`);
+export const duration = (ms: number | null) =>
+  ms === null ? "—" : ms < 1000 ? `${ms} ms` : `${(ms / 1000).toFixed(1)} s`;
 
 export const relative = (iso: string, now = Date.now()) => {
   const diff = now - new Date(iso).getTime();

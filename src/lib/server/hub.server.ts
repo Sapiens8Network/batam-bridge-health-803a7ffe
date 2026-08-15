@@ -104,7 +104,8 @@ export function mapQuote(quote: Row | null, itinerary: Row | null, requestId: st
     id: (quote?.["id"] as string) ?? `pending-${requestId}`,
     inquiryId: requestId,
     currency: "SGD",
-    source: (quote?.["source"] as string) === "HOSPITAL_OVERRIDE" ? "HOSPITAL_OVERRIDE" : "AI_ESTIMATE",
+    source:
+      (quote?.["source"] as string) === "HOSPITAL_OVERRIDE" ? "HOSPITAL_OVERRIDE" : "AI_ESTIMATE",
     breakdown: breakdownOf(itinerary),
     singaporeBenchmark: {
       treatment: n(itinerary?.["singapore_benchmark_sgd"]),
@@ -125,14 +126,19 @@ const stepKind = (type: string, index: number, total: number): ItineraryStep["ki
   return "HOSPITAL";
 };
 
-export function mapItinerary(itinerary: Row | null, items: Row[], requestId: string): Itinerary | null {
+export function mapItinerary(
+  itinerary: Row | null,
+  items: Row[],
+  requestId: string,
+): Itinerary | null {
   if (!itinerary) return null;
   const sorted = [...items].sort((a, b) => Number(a["sort_order"]) - Number(b["sort_order"]));
   return {
     id: itinerary["id"] as string,
     token: itinerary["public_token"] as string,
     inquiryId: requestId,
-    status: itinerary["status"] === "REJECTED" ? "DRAFT" : (itinerary["status"] as Itinerary["status"]),
+    status:
+      itinerary["status"] === "REJECTED" ? "DRAFT" : (itinerary["status"] as Itinerary["status"]),
     hospitalId: (itinerary["hospital_id"] as string) ?? "",
     updatedAt: iso(itinerary["updated_at"]),
     steps: sorted.map((item, index) => ({
@@ -149,13 +155,20 @@ export function mapItinerary(itinerary: Row | null, items: Row[], requestId: str
         { label: "Day", value: `Day ${String(item["day_number"])}` },
         ...(item["time"] ? [{ label: "Time", value: item["time"] as string }] : []),
         ...(item["location"] ? [{ label: "Location", value: item["location"] as string }] : []),
-        ...(item["description"] ? [{ label: "Details", value: item["description"] as string }] : []),
+        ...(item["description"]
+          ? [{ label: "Details", value: item["description"] as string }]
+          : []),
       ],
     })),
   };
 }
 
-export function mapInquiry(row: Row, quote: Row | null, itinerary: Row | null, review: Row | null): Inquiry {
+export function mapInquiry(
+  row: Row,
+  quote: Row | null,
+  itinerary: Row | null,
+  review: Row | null,
+): Inquiry {
   const ai = (row["ai_request"] ?? {}) as Row;
   return {
     id: row["id"] as string,
@@ -177,7 +190,9 @@ export function mapInquiry(row: Row, quote: Row | null, itinerary: Row | null, r
     hospitalReview: reviewState((row["hospital_review"] as string | null) ?? null),
     doctorReview: {
       doctorId: (review?.["doctor_id"] as string | null) ?? null,
-      state: review ? reviewState(review["status"] === "PENDING" ? "PENDING" : (review["status"] as string)) : "NOT_REQUIRED",
+      state: review
+        ? reviewState(review["status"] === "PENDING" ? "PENDING" : (review["status"] as string))
+        : "NOT_REQUIRED",
       proposedTreatment: (review?.["proposed_treatment"] as string | null) ?? null,
       estimatedDurationMinutes: review?.["estimated_duration_minutes"]
         ? Number(review["estimated_duration_minutes"])
@@ -214,7 +229,10 @@ export function mapEvent(row: Row): AiActivityEvent {
     at: iso(row["started_at"]),
     label: (row["message"] as string) || (row["event_type"] as string),
     state,
-    durationMs: row["duration_ms"] === null || row["duration_ms"] === undefined ? null : Number(row["duration_ms"]),
+    durationMs:
+      row["duration_ms"] === null || row["duration_ms"] === undefined
+        ? null
+        : Number(row["duration_ms"]),
     detail: (row["metadata"] as AiActivityEvent["detail"]) ?? undefined,
   };
 }
@@ -292,7 +310,10 @@ interface Bundle {
 
 export async function loadBundle(requestIds?: string[]): Promise<Bundle> {
   const sb = await db();
-  let requestQuery = sb.from("medical_requests").select("*").order("updated_at", { ascending: false });
+  let requestQuery = sb
+    .from("medical_requests")
+    .select("*")
+    .order("updated_at", { ascending: false });
   if (requestIds) requestQuery = requestQuery.in("id", requestIds);
   const [requests, itineraries, patients, hospitals, doctors] = await Promise.all([
     requestQuery,
@@ -305,7 +326,13 @@ export async function loadBundle(requestIds?: string[]): Promise<Bundle> {
   const [quotes, items, reviews] = await Promise.all([
     sb.from("quotes").select("*").order("created_at", { ascending: false }),
     itineraryRows.length
-      ? sb.from("itinerary_items").select("*").in("itinerary_id", itineraryRows.map((i) => i["id"] as string))
+      ? sb
+          .from("itinerary_items")
+          .select("*")
+          .in(
+            "itinerary_id",
+            itineraryRows.map((i) => i["id"] as string),
+          )
       : Promise.resolve({ data: [] as Row[] }),
     sb.from("doctor_reviews").select("*").order("created_at", { ascending: false }),
   ]);
@@ -334,11 +361,15 @@ export function buildViews(bundle: Bundle): InquiryView[] {
   return bundle.requests.map((request) => {
     const requestId = request["id"] as string;
     const itinerary = bundle.itineraries.find((i) => i["medical_request_id"] === requestId) ?? null;
-    const quote = itinerary ? (bundle.quotes.find((q) => q["itinerary_id"] === itinerary["id"]) ?? null) : null;
+    const quote = itinerary
+      ? (bundle.quotes.find((q) => q["itinerary_id"] === itinerary["id"]) ?? null)
+      : null;
     const review = bundle.reviews.find((r) => r["medical_request_id"] === requestId) ?? null;
     const patientRow = bundle.patients.find((p) => p["id"] === request["patient_id"]);
     const hospitalRow = bundle.hospitals.find((h) => h["id"] === request["hospital_id"]);
-    const items = itinerary ? bundle.items.filter((i) => i["itinerary_id"] === itinerary["id"]) : [];
+    const items = itinerary
+      ? bundle.items.filter((i) => i["itinerary_id"] === itinerary["id"])
+      : [];
     const inquiry = mapInquiry(request, quote, itinerary, review);
     const doctorRow = review?.["doctor_id"]
       ? bundle.doctors.find((d) => d["id"] === review["doctor_id"])
@@ -348,7 +379,10 @@ export function buildViews(bundle: Bundle): InquiryView[] {
     return {
       inquiry,
       patient: patientRow
-        ? { ...mapPatient(patientRow), preferredDate: iso(request["preferred_date"] ?? request["created_at"]) }
+        ? {
+            ...mapPatient(patientRow),
+            preferredDate: iso(request["preferred_date"] ?? request["created_at"]),
+          }
         : {
             id: "",
             name: "Unknown patient",
@@ -363,7 +397,14 @@ export function buildViews(bundle: Bundle): InquiryView[] {
       quote: mapQuote(quote, itinerary, requestId),
       hospital: hospitalRow
         ? mapHospital(hospitalRow)
-        : { id: "", name: "Unassigned hospital", city: "Batam", accreditation: "—", contactPhone: "—", specialties: [] },
+        : {
+            id: "",
+            name: "Unassigned hospital",
+            city: "Batam",
+            accreditation: "—",
+            contactPhone: "—",
+            specialties: [],
+          },
       doctor: doctorRow ? mapDoctor(doctorRow) : null,
       itinerary: mapItinerary(itinerary, items, requestId),
     };
@@ -450,7 +491,10 @@ const humanizeAction = (action: string) =>
     .map((word, index) => (index === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word))
     .join(" ");
 
-export async function dashboardSummary(): Promise<{ summary: DashboardSummary; feed: ActivityFeedItem[] }> {
+export async function dashboardSummary(): Promise<{
+  summary: DashboardSummary;
+  feed: ActivityFeedItem[];
+}> {
   const sb = await db();
   const [requests, itineraries, feed] = await Promise.all([
     sb.from("medical_requests").select("status,hospital_review"),
@@ -458,13 +502,18 @@ export async function dashboardSummary(): Promise<{ summary: DashboardSummary; f
     activityFeed(),
   ]);
   const rows = requests.data ?? [];
-  const savings = (itineraries.data ?? []).reduce((sum, row) => sum + Math.max(n(row["estimated_savings_sgd"]), 0), 0);
+  const savings = (itineraries.data ?? []).reduce(
+    (sum, row) => sum + Math.max(n(row["estimated_savings_sgd"]), 0),
+    0,
+  );
   return {
     summary: {
       singaporeLeads: rows.length,
       itinerariesGenerated: (itineraries.data ?? []).length,
       hospitalReviewsPending: rows.filter((r) => r["hospital_review"] === "PENDING").length,
-      confirmedBookings: rows.filter((r) => ["CONFIRMED_BOOKING", "TRAVEL_READY"].includes(r["status"] as string)).length,
+      confirmedBookings: rows.filter((r) =>
+        ["CONFIRMED_BOOKING", "TRAVEL_READY"].includes(r["status"] as string),
+      ).length,
       completedPatients: rows.filter((r) => r["status"] === "COMPLETED").length,
       estimatedSavings: Math.round(savings),
     },
@@ -514,8 +563,20 @@ export async function calculateCost(input: CostInput): Promise<CostResult> {
       .eq("treatment_id", input.treatmentId)
       .eq("status", "ACTIVE")
       .maybeSingle(),
-    sb.from("ferry_options").select("*").eq("status", "ACTIVE").order("estimated_cost_sgd").limit(1).maybeSingle(),
-    sb.from("hotels").select("*").eq("status", "ACTIVE").order("price_per_night_sgd").limit(1).maybeSingle(),
+    sb
+      .from("ferry_options")
+      .select("*")
+      .eq("status", "ACTIVE")
+      .order("estimated_cost_sgd")
+      .limit(1)
+      .maybeSingle(),
+    sb
+      .from("hotels")
+      .select("*")
+      .eq("status", "ACTIVE")
+      .order("price_per_night_sgd")
+      .limit(1)
+      .maybeSingle(),
     sb
       .from("transport_options")
       .select("*")
@@ -568,7 +629,11 @@ export async function calculateCost(input: CostInput): Promise<CostResult> {
   };
 }
 
-export async function persistCost(itineraryId: string, breakdown: CostBreakdown, benchmark: CostResult["benchmark"]) {
+export async function persistCost(
+  itineraryId: string,
+  breakdown: CostBreakdown,
+  benchmark: CostResult["benchmark"],
+) {
   const sb = await db();
   const total = n(Object.values(breakdown).reduce((a, b) => a + b, 0));
   const benchTotal = benchmark.treatment + benchmark.travel + benchmark.accommodation;
@@ -590,7 +655,8 @@ export async function persistCost(itineraryId: string, breakdown: CostBreakdown,
       singapore_benchmark_travel_sgd: benchmark.travel,
       singapore_benchmark_accommodation_sgd: benchmark.accommodation,
       estimated_savings_sgd: savings,
-      estimated_savings_percentage: benchTotal > 0 ? Math.round((savings / benchTotal) * 10000) / 100 : 0,
+      estimated_savings_percentage:
+        benchTotal > 0 ? Math.round((savings / benchTotal) * 10000) / 100 : 0,
     })
     .eq("id", itineraryId);
 }

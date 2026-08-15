@@ -75,11 +75,15 @@ function QuotesPage() {
                       <span className="truncate text-sm font-semibold">{v.patient.name}</span>
                       <Pill tone={meta.tone}>{meta.label}</Pill>
                     </div>
-                    <p className="mt-1 text-xs text-muted-foreground">{v.inquiry.aiRequest.treatment}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {v.inquiry.aiRequest.treatment}
+                    </p>
                     <p className="mt-1 text-xs font-medium tabular-nums text-batam">
                       {sgd(t.packageTotal)} · saves {sgd(t.savings)}
                     </p>
-                    <p className="text-[11px] text-muted-foreground">{relative(v.quote.updatedAt)}</p>
+                    <p className="text-[11px] text-muted-foreground">
+                      {relative(v.quote.updatedAt)}
+                    </p>
                   </button>
                 </li>
               );

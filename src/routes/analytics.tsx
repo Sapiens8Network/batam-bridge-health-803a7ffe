@@ -29,7 +29,10 @@ export const Route = createFileRoute("/analytics")({
           "Inquiry volume, AI response times, treatment demand, conversion funnel and estimated patient savings across Singapore-Batam cases.",
       },
       { property: "og:title", content: "Analytics & Conversion · MedBridge Pass" },
-      { property: "og:description", content: "Performance metrics for cross-border medical travel operations." },
+      {
+        property: "og:description",
+        content: "Performance metrics for cross-border medical travel operations.",
+      },
     ],
   }),
   component: AnalyticsPage,
@@ -45,7 +48,15 @@ function Kpi({ label, value, hint }: { label: string; value: string; hint?: stri
   );
 }
 
-function Panel({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
+function Panel({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="rounded-xl border bg-card p-4">
       <h2 className="text-sm font-semibold">{title}</h2>
@@ -88,13 +99,32 @@ function AnalyticsPage() {
 
   return (
     <HospitalShell>
-      <PageHeader title="Analytics" description="Volume, speed, demand and value delivered to Singapore patients" />
+      <PageHeader
+        title="Analytics"
+        description="Volume, speed, demand and value delivered to Singapore patients"
+      />
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Kpi label="Conversion rate" value={pct(data.conversionRate)} hint="Inquiry to confirmed booking" />
-        <Kpi label="Avg. patient savings" value={sgd(data.avgSavings)} hint="Versus Singapore benchmark" />
-        <Kpi label="Pipeline value" value={sgd(data.revenueOpportunity)} hint="Sum of active packages" />
-        <Kpi label="Cases tracked" value={String(data.funnel[0]?.count ?? 0)} hint="Across all channels" />
+        <Kpi
+          label="Conversion rate"
+          value={pct(data.conversionRate)}
+          hint="Inquiry to confirmed booking"
+        />
+        <Kpi
+          label="Avg. patient savings"
+          value={sgd(data.avgSavings)}
+          hint="Versus Singapore benchmark"
+        />
+        <Kpi
+          label="Pipeline value"
+          value={sgd(data.revenueOpportunity)}
+          hint="Sum of active packages"
+        />
+        <Kpi
+          label="Cases tracked"
+          value={String(data.funnel[0]?.count ?? 0)}
+          hint="Across all channels"
+        />
       </div>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-2">
@@ -104,33 +134,64 @@ function AnalyticsPage() {
             <XAxis dataKey="month" {...axis} />
             <YAxis {...axis} />
             <Tooltip contentStyle={tooltipStyle} />
-            <Bar dataKey="inquiries" name="Inquiries" fill="var(--color-singapore)" radius={[6, 6, 0, 0]} />
-            <Bar dataKey="confirmed" name="Confirmed" fill="var(--color-batam)" radius={[6, 6, 0, 0]} />
+            <Bar
+              dataKey="inquiries"
+              name="Inquiries"
+              fill="var(--color-singapore)"
+              radius={[6, 6, 0, 0]}
+            />
+            <Bar
+              dataKey="confirmed"
+              name="Confirmed"
+              fill="var(--color-batam)"
+              radius={[6, 6, 0, 0]}
+            />
           </BarChart>
         </Panel>
 
-        <Panel title="AI response time" subtitle="Seconds from inbound message to structured itinerary">
+        <Panel
+          title="AI response time"
+          subtitle="Seconds from inbound message to structured itinerary"
+        >
           <LineChart data={data.responseTimes}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
             <XAxis dataKey="day" {...axis} />
             <YAxis {...axis} />
             <Tooltip contentStyle={tooltipStyle} />
-            <Line type="monotone" dataKey="seconds" name="Seconds" stroke="var(--color-batam)" strokeWidth={2} dot={false} />
+            <Line
+              type="monotone"
+              dataKey="seconds"
+              name="Seconds"
+              stroke="var(--color-batam)"
+              strokeWidth={2}
+              dot={false}
+            />
           </LineChart>
         </Panel>
 
-        <Panel title="Treatment pricing demand" subtitle="Batam package versus Singapore benchmark by treatment">
+        <Panel
+          title="Treatment pricing demand"
+          subtitle="Batam package versus Singapore benchmark by treatment"
+        >
           <BarChart data={data.byTreatment}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
             <XAxis dataKey="name" {...axis} interval={0} height={50} angle={-15} textAnchor="end" />
             <YAxis {...axis} />
             <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => sgd(v)} />
-            <Bar dataKey="singapore" name="Singapore" fill="var(--color-singapore)" radius={[6, 6, 0, 0]} />
+            <Bar
+              dataKey="singapore"
+              name="Singapore"
+              fill="var(--color-singapore)"
+              radius={[6, 6, 0, 0]}
+            />
             <Bar dataKey="batam" name="Batam" fill="var(--color-batam)" radius={[6, 6, 0, 0]} />
           </BarChart>
         </Panel>
 
-        <Panel title="Conversion funnel" subtitle="From inbound inquiry to confirmed cross-border booking">
+        <Panel
+          title="Conversion funnel"
+          subtitle="From inbound inquiry to confirmed cross-border booking"
+        >
           <BarChart data={data.funnel} layout="vertical">
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" horizontal={false} />
             <XAxis type="number" {...axis} />
@@ -140,7 +201,13 @@ function AnalyticsPage() {
               {data.funnel.map((_, i) => (
                 <Cell
                   key={i}
-                  fill={i === 0 ? "var(--color-singapore)" : i === data.funnel.length - 1 ? "var(--color-batam)" : "var(--color-info)"}
+                  fill={
+                    i === 0
+                      ? "var(--color-singapore)"
+                      : i === data.funnel.length - 1
+                        ? "var(--color-batam)"
+                        : "var(--color-info)"
+                  }
                 />
               ))}
             </Bar>

@@ -4,7 +4,8 @@
  * structured fields, events and statuses.
  */
 
-export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+export type JsonValue =
+  string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
 export type Channel = "WHATSAPP" | "TELEGRAM" | "WEB";
 

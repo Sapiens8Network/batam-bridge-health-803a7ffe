@@ -20,7 +20,10 @@ export const Route = createFileRoute("/doctors")({
           "Batam specialists confirm proposed treatments, procedure duration and appointment slots before any quote reaches the patient.",
       },
       { property: "og:title", content: "Doctor Review Queue · MedBridge Pass" },
-      { property: "og:description", content: "Clinical sign-off for cross-border medical travel cases." },
+      {
+        property: "og:description",
+        content: "Clinical sign-off for cross-border medical travel cases.",
+      },
     ],
   }),
   component: DoctorsPage,
@@ -34,7 +37,10 @@ function DoctorsPage() {
 
   return (
     <HospitalShell>
-      <PageHeader title="Doctors & clinical review" description="Specialist confirmation is required before a quote is sent" />
+      <PageHeader
+        title="Doctors & clinical review"
+        description="Specialist confirmation is required before a quote is sent"
+      />
 
       {inquiries.isPending || reference.isPending ? (
         <LoadingBlock label="Loading clinical queue" rows={4} />
@@ -45,7 +51,10 @@ function DoctorsPage() {
           <div className="space-y-3">
             <h2 className="text-sm font-semibold">Review queue</h2>
             {pending.length === 0 ? (
-              <EmptyBlock title="No cases awaiting clinical review" description="Every active case has doctor approval." />
+              <EmptyBlock
+                title="No cases awaiting clinical review"
+                description="Every active case has doctor approval."
+              />
             ) : (
               pending.map((v) => (
                 <div key={v.inquiry.id} className="space-y-3 rounded-xl border bg-card p-4">

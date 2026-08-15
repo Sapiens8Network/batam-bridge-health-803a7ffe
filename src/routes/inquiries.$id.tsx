@@ -29,7 +29,10 @@ export const Route = createFileRoute("/inquiries/$id")({
           "Structured patient request, AI-extracted treatment data, cost comparison, quote builder and doctor review for a single inquiry.",
       },
       { property: "og:title", content: "Inquiry Detail · MedBridge Pass" },
-      { property: "og:description", content: "Review and approve a cross-border medical travel proposal." },
+      {
+        property: "og:description",
+        content: "Review and approve a cross-border medical travel proposal.",
+      },
     ],
   }),
   component: InquiryDetailPage,
@@ -78,7 +81,9 @@ function InquiryDetailPage() {
     benchmark: quote.singaporeBenchmark,
     hospital: { id: hospital.id, name: hospital.name, review: inquiry.hospitalReview },
     doctor_review: inquiry.doctorReview,
-    itinerary: itinerary ? { id: itinerary.id, status: itinerary.status, steps: itinerary.steps.length } : null,
+    itinerary: itinerary
+      ? { id: itinerary.id, status: itinerary.status, steps: itinerary.steps.length }
+      : null,
   };
 
   return (
@@ -129,7 +134,10 @@ function InquiryDetailPage() {
               <Field label="Name" value={patient.name} />
               <Field label="Country" value={patient.country} />
               <Field label="Phone" value={patient.phoneMasked} />
-              <Field label="Channel" value={inquiry.channel === "WHATSAPP" ? "WhatsApp" : "Telegram"} />
+              <Field
+                label="Channel"
+                value={inquiry.channel === "WHATSAPP" ? "WhatsApp" : "Telegram"}
+              />
               <Field label="Travellers" value={String(patient.travellers)} />
               <Field label="Preferred date" value={patient.preferredDate} />
             </dl>
@@ -151,7 +159,10 @@ function InquiryDetailPage() {
             <dl className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3">
               <Field label="Treatment" value={inquiry.aiRequest.treatment} />
               <Field label="Category" value={inquiry.aiRequest.treatmentCategory} />
-              <Field label="Preferred duration" value={`${inquiry.aiRequest.preferredDurationDays} days`} />
+              <Field
+                label="Preferred duration"
+                value={`${inquiry.aiRequest.preferredDurationDays} days`}
+              />
             </dl>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <div>
@@ -182,7 +193,8 @@ function InquiryDetailPage() {
               </div>
             </div>
             <p className="mt-3 text-[11px] text-muted-foreground">
-              Fields above are extracted from the patient's own words. No clinical assessment is inferred.
+              Fields above are extracted from the patient's own words. No clinical assessment is
+              inferred.
             </p>
           </section>
 

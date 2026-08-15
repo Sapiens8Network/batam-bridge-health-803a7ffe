@@ -3,7 +3,13 @@ import { ShieldAlert } from "lucide-react";
 import { MEDICAL_DISCLAIMER } from "@/lib/status";
 import { cn } from "@/lib/utils";
 
-export function MedicalDisclaimer({ className, compact = false }: { className?: string; compact?: boolean }) {
+export function MedicalDisclaimer({
+  className,
+  compact = false,
+}: {
+  className?: string;
+  compact?: boolean;
+}) {
   return (
     <div
       className={cn(

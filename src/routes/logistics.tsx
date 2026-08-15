@@ -16,10 +16,14 @@ export const Route = createFileRoute("/logistics")({
       { title: "Travel & Logistics · MedBridge Pass" },
       {
         name: "description",
-        content: "Ferry crossings, private transfers and recovery hotels used to assemble Singapore-to-Batam care journeys.",
+        content:
+          "Ferry crossings, private transfers and recovery hotels used to assemble Singapore-to-Batam care journeys.",
       },
       { property: "og:title", content: "Travel & Logistics · MedBridge Pass" },
-      { property: "og:description", content: "Ferries, transfers and recovery stays for medical travellers." },
+      {
+        property: "og:description",
+        content: "Ferries, transfers and recovery stays for medical travellers.",
+      },
     ],
   }),
   component: LogisticsPage,
@@ -30,7 +34,10 @@ function LogisticsPage() {
 
   return (
     <HospitalShell>
-      <PageHeader title="Travel & logistics" description="The Singapore to Batam journey layer of every itinerary" />
+      <PageHeader
+        title="Travel & logistics"
+        description="The Singapore to Batam journey layer of every itinerary"
+      />
 
       {isPending ? (
         <LoadingBlock label="Loading logistics" rows={4} />

@@ -4,7 +4,14 @@ import { useState } from "react";
 import { Pill } from "@/components/hub/Pill";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { clock, duration } from "@/lib/format";
 import type { AiActivityEvent } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -37,7 +44,9 @@ export function AiActivityPanel({
       <header className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3">
         <div>
           <h3 className="text-sm font-semibold text-foreground">AI agent activity</h3>
-          <p className="text-xs text-muted-foreground">Structured workflow events from the orchestration backend</p>
+          <p className="text-xs text-muted-foreground">
+            Structured workflow events from the orchestration backend
+          </p>
         </div>
         {structured !== undefined ? <StructuredDataDialog data={structured} /> : null}
       </header>
@@ -54,8 +63,10 @@ export function AiActivityPanel({
                       "flex size-6 shrink-0 items-center justify-center rounded-full border",
                       event.state === "DONE" && "border-success/30 bg-success-soft text-success",
                       event.state === "RUNNING" && "border-info/30 bg-info-soft text-info",
-                      event.state === "ATTENTION" && "border-warning/40 bg-warning-soft text-warning-foreground",
-                      event.state === "FAILED" && "border-destructive/30 bg-destructive/10 text-destructive",
+                      event.state === "ATTENTION" &&
+                        "border-warning/40 bg-warning-soft text-warning-foreground",
+                      event.state === "FAILED" &&
+                        "border-destructive/30 bg-destructive/10 text-destructive",
                     )}
                   >
                     <Icon className={cn("size-3.5", event.state === "RUNNING" && "animate-spin")} />
@@ -69,7 +80,12 @@ export function AiActivityPanel({
                   <Pill tone={stateTone[event.state]}>{event.state}</Pill>
                   {event.detail ? (
                     <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="icon" className="size-7" aria-label="Toggle technical details">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-7"
+                        aria-label="Toggle technical details"
+                      >
                         <ChevronDown className="size-4" />
                       </Button>
                     </CollapsibleTrigger>
@@ -106,7 +122,8 @@ export function StructuredDataDialog({ data }: { data: unknown }) {
         <DialogHeader>
           <DialogTitle>Structured AI output</DialogTitle>
           <DialogDescription>
-            Developer view of the structured JSON returned by the backend. Model reasoning is never stored or shown.
+            Developer view of the structured JSON returned by the backend. Model reasoning is never
+            stored or shown.
           </DialogDescription>
         </DialogHeader>
         <pre className="max-h-[60vh] overflow-auto rounded-lg bg-muted p-4 text-xs leading-5">

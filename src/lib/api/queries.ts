@@ -15,11 +15,14 @@ export const qk = {
   publicItinerary: (token: string) => ["public-itinerary", token] as const,
 };
 
-export const dashboardQuery = () => queryOptions({ queryKey: qk.dashboard, queryFn: () => api.dashboardSummary() });
-export const inquiriesQuery = () => queryOptions({ queryKey: qk.inquiries, queryFn: () => api.inquiries() });
+export const dashboardQuery = () =>
+  queryOptions({ queryKey: qk.dashboard, queryFn: () => api.dashboardSummary() });
+export const inquiriesQuery = () =>
+  queryOptions({ queryKey: qk.inquiries, queryFn: () => api.inquiries() });
 export const inquiryQuery = (id: string) =>
   queryOptions({ queryKey: qk.inquiry(id), queryFn: () => api.inquiry(id), retry: false });
-export const patientsQuery = () => queryOptions({ queryKey: qk.patients, queryFn: () => api.patients() });
+export const patientsQuery = () =>
+  queryOptions({ queryKey: qk.patients, queryFn: () => api.patients() });
 export const patientQuery = (id: string) =>
   queryOptions({ queryKey: qk.patient(id), queryFn: () => api.patient(id), retry: false });
 export const messagesQuery = (patientId?: string) =>
@@ -29,7 +32,13 @@ export const activityQuery = (inquiryId?: string) =>
     queryKey: qk.activity(inquiryId),
     queryFn: () => (inquiryId ? api.aiActivity(inquiryId) : api.aiActivityAll()),
   });
-export const referenceQuery = () => queryOptions({ queryKey: qk.reference, queryFn: () => api.reference() });
-export const analyticsQuery = () => queryOptions({ queryKey: qk.analytics, queryFn: () => api.analytics() });
+export const referenceQuery = () =>
+  queryOptions({ queryKey: qk.reference, queryFn: () => api.reference() });
+export const analyticsQuery = () =>
+  queryOptions({ queryKey: qk.analytics, queryFn: () => api.analytics() });
 export const publicItineraryQuery = (token: string) =>
-  queryOptions({ queryKey: qk.publicItinerary(token), queryFn: () => api.publicItinerary(token), retry: false });
+  queryOptions({
+    queryKey: qk.publicItinerary(token),
+    queryFn: () => api.publicItinerary(token),
+    retry: false,
+  });

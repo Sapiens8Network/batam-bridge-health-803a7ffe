@@ -32,8 +32,9 @@ export function QuoteBuilder({ quote, itineraryId }: { quote: Quote; itineraryId
   const totals = computeTotals(draft, quote.singaporeBenchmark);
 
   const action = useMutation({
-    mutationFn: (input: { action: "SAVE_DRAFT" | "REQUEST_DOCTOR" | "APPROVE" | "REJECT" | "SEND" }) =>
-      api.quoteAction(quote.id, { action: input.action, breakdown: draft }),
+    mutationFn: (input: {
+      action: "SAVE_DRAFT" | "REQUEST_DOCTOR" | "APPROVE" | "REJECT" | "SEND";
+    }) => api.quoteAction(quote.id, { action: input.action, breakdown: draft }),
     onSuccess: (_res, input) => {
       setDirty(false);
       const label: Record<typeof input.action, string> = {
@@ -75,7 +76,9 @@ export function QuoteBuilder({ quote, itineraryId }: { quote: Quote; itineraryId
       <div className="grid gap-4 p-4 lg:grid-cols-[1.4fr_1fr]">
         <div className="grid gap-4 sm:grid-cols-2">
           <fieldset className="space-y-2.5">
-            <legend className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Medical</legend>
+            <legend className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Medical
+            </legend>
             {medicalKeys.map((key) => (
               <div key={key} className="grid gap-1">
                 <Label htmlFor={`q-${key}`} className="text-xs text-muted-foreground">
@@ -128,7 +131,9 @@ export function QuoteBuilder({ quote, itineraryId }: { quote: Quote; itineraryId
             ))}
             <div className="mt-1 flex items-baseline justify-between border-t pt-2">
               <dt className="font-semibold text-foreground">Complete package</dt>
-              <dd className="text-lg font-semibold tabular-nums text-batam">{sgd(totals.packageTotal)}</dd>
+              <dd className="text-lg font-semibold tabular-nums text-batam">
+                {sgd(totals.packageTotal)}
+              </dd>
             </div>
             <div className="flex items-baseline justify-between">
               <dt className="text-muted-foreground">Estimated savings</dt>
@@ -141,13 +146,27 @@ export function QuoteBuilder({ quote, itineraryId }: { quote: Quote; itineraryId
           {dirty ? <Pill tone="warning">Unsaved hospital edits</Pill> : null}
 
           <div className="grid grid-cols-2 gap-2">
-            <Button variant="outline" size="sm" disabled={action.isPending} onClick={() => action.mutate({ action: "SAVE_DRAFT" })}>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={action.isPending}
+              onClick={() => action.mutate({ action: "SAVE_DRAFT" })}
+            >
               <Save className="size-4" /> Save draft
             </Button>
-            <Button variant="outline" size="sm" disabled={action.isPending} onClick={() => action.mutate({ action: "REQUEST_DOCTOR" })}>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={action.isPending}
+              onClick={() => action.mutate({ action: "REQUEST_DOCTOR" })}
+            >
               <Stethoscope className="size-4" /> Doctor review
             </Button>
-            <Button size="sm" disabled={action.isPending} onClick={() => action.mutate({ action: "APPROVE" })}>
+            <Button
+              size="sm"
+              disabled={action.isPending}
+              onClick={() => action.mutate({ action: "APPROVE" })}
+            >
               <Check className="size-4" /> Approve quote
             </Button>
             <Button
