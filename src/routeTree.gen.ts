@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AiActivityRouteImport } from './routes/ai-activity'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as ChatRouteImport } from './routes/chat'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DoctorsRouteImport } from './routes/doctors'
 import { Route as LogisticsRouteImport } from './routes/logistics'
@@ -40,6 +41,11 @@ const AiActivityRoute = AiActivityRouteImport.update({
 const AnalyticsRoute = AnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ai-activity': typeof AiActivityRoute
   '/analytics': typeof AnalyticsRoute
+  '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
   '/doctors': typeof DoctorsRoute
   '/logistics': typeof LogisticsRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ai-activity': typeof AiActivityRoute
   '/analytics': typeof AnalyticsRoute
+  '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
   '/doctors': typeof DoctorsRoute
   '/logistics': typeof LogisticsRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/ai-activity': typeof AiActivityRoute
   '/analytics': typeof AnalyticsRoute
+  '/chat': typeof ChatRoute
   '/dashboard': typeof DashboardRoute
   '/doctors': typeof DoctorsRoute
   '/logistics': typeof LogisticsRoute
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/'
     | '/ai-activity'
     | '/analytics'
+    | '/chat'
     | '/dashboard'
     | '/doctors'
     | '/logistics'
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/'
     | '/ai-activity'
     | '/analytics'
+    | '/chat'
     | '/dashboard'
     | '/doctors'
     | '/logistics'
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/'
     | '/ai-activity'
     | '/analytics'
+    | '/chat'
     | '/dashboard'
     | '/doctors'
     | '/logistics'
@@ -237,6 +249,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AiActivityRoute: typeof AiActivityRoute
   AnalyticsRoute: typeof AnalyticsRoute
+  ChatRoute: typeof ChatRoute
   DashboardRoute: typeof DashboardRoute
   DoctorsRoute: typeof DoctorsRoute
   LogisticsRoute: typeof LogisticsRoute
@@ -274,6 +287,13 @@ declare module '@tanstack/react-router' {
       path: '/analytics'
       fullPath: '/analytics'
       preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -381,6 +401,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AiActivityRoute: AiActivityRoute,
   AnalyticsRoute: AnalyticsRoute,
+  ChatRoute: ChatRoute,
   DashboardRoute: DashboardRoute,
   DoctorsRoute: DoctorsRoute,
   LogisticsRoute: LogisticsRoute,
