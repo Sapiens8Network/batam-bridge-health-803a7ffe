@@ -40,7 +40,7 @@ function InquiriesPage() {
     const term = search.trim().toLowerCase();
     if (!term) return data ?? [];
     return (data ?? []).filter((v) =>
-      [v.patient.name, v.inquiry.reference, v.aiTreatment ?? v.inquiry.aiRequest.treatment]
+      [v.patient.name, v.inquiry.reference, v.inquiry.aiRequest.treatment]
         .join(" ")
         .toLowerCase()
         .includes(term),

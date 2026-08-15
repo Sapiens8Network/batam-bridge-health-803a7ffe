@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as InquiriesIndexRouteImport } from './routes/inquiries.index'
+import { Route as InquiriesIdRouteImport } from './routes/inquiries.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +24,49 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InquiriesIndexRoute = InquiriesIndexRouteImport.update({
+  id: '/inquiries/',
+  path: '/inquiries/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InquiriesIdRoute = InquiriesIdRouteImport.update({
+  id: '/inquiries/$id',
+  path: '/inquiries/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/inquiries/$id': typeof InquiriesIdRoute
+  '/inquiries/': typeof InquiriesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/inquiries/$id': typeof InquiriesIdRoute
+  '/inquiries': typeof InquiriesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/inquiries/$id': typeof InquiriesIdRoute
+  '/inquiries/': typeof InquiriesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard'
+  fullPaths: '/' | '/dashboard' | '/inquiries/$id' | '/inquiries/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard'
-  id: '__root__' | '/' | '/dashboard'
+  to: '/' | '/dashboard' | '/inquiries/$id' | '/inquiries'
+  id: '__root__' | '/' | '/dashboard' | '/inquiries/$id' | '/inquiries/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
+  InquiriesIdRoute: typeof InquiriesIdRoute
+  InquiriesIndexRoute: typeof InquiriesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +85,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inquiries/': {
+      id: '/inquiries/'
+      path: '/inquiries'
+      fullPath: '/inquiries/'
+      preLoaderRoute: typeof InquiriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inquiries/$id': {
+      id: '/inquiries/$id'
+      path: '/inquiries/$id'
+      fullPath: '/inquiries/$id'
+      preLoaderRoute: typeof InquiriesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
+  InquiriesIdRoute: InquiriesIdRoute,
+  InquiriesIndexRoute: InquiriesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
