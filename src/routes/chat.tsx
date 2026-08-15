@@ -9,6 +9,8 @@ import {
   Check,
   Leaf,
   Loader2,
+  Minus,
+  Plus,
   Send,
   Ship,
   Sparkles,
