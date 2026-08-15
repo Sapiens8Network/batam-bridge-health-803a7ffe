@@ -96,6 +96,8 @@ const emptySlots: ChatSlots = {
   treatment: null,
   treatmentId: null,
   date: null,
+  patients: null,
+  companions: null,
   travellers: null,
   nights: null,
   notes: null,
