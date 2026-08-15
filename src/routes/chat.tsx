@@ -15,7 +15,7 @@ import {
   User,
 } from "lucide-react";
 
-import { Disclaimer } from "@/components/hub/Disclaimer";
+import { MedicalDisclaimer } from "@/components/hub/Disclaimer";
 import { Pill } from "@/components/hub/Pill";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -398,7 +398,7 @@ function ChatPage() {
             </div>
           )}
 
-          <Disclaimer />
+          <MedicalDisclaimer />
         </aside>
       </div>
     </main>
