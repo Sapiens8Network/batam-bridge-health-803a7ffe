@@ -117,6 +117,7 @@ function MessagesPage() {
               <TabsTrigger value="ALL">All</TabsTrigger>
               <TabsTrigger value="WHATSAPP">WhatsApp</TabsTrigger>
               <TabsTrigger value="TELEGRAM">Telegram</TabsTrigger>
+              <TabsTrigger value="WEB">Website</TabsTrigger>
             </TabsList>
           </Tabs>
         }
