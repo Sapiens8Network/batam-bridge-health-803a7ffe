@@ -141,6 +141,12 @@ function transcriptOf(row: Row): ChatTurn[] {
 
 function selectionsOf(row: Row, slots: ChatSlots): ChatSelections {
   const raw = (row["selections"] as Partial<ChatSelections>) ?? {};
+  const legacyTravellers = raw.travellers ?? slots.travellers ?? 1;
+  const patients = Math.max(1, raw.patients ?? slots.patients ?? 1);
+  const companions = Math.max(
+    0,
+    raw.companions ?? slots.companions ?? Math.max(0, legacyTravellers - patients),
+  );
   return {
     hospitalId: raw.hospitalId ?? null,
     treatmentId: raw.treatmentId ?? slots.treatmentId,
@@ -148,7 +154,9 @@ function selectionsOf(row: Row, slots: ChatSlots): ChatSelections {
     hotelId: raw.hotelId ?? null,
     transportId: raw.transportId ?? null,
     includeConcierge: raw.includeConcierge ?? true,
-    travellers: raw.travellers ?? slots.travellers ?? 1,
+    patients,
+    companions,
+    travellers: patients + companions,
     nights: raw.nights ?? slots.nights ?? 1,
     date: raw.date ?? slots.date ?? null,
   };
