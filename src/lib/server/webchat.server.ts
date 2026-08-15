@@ -437,8 +437,24 @@ async function planFor(row: Row): Promise<ChatPlan | null> {
 /* --------------------------------------------------------------- actions -- */
 
 export async function getSession(token?: string | null): Promise<ChatSessionPayload> {
+  const sb = await db();
   const row = await loadSession(token);
-  return toPayload(row, await planFor(row));
+  const payload = toPayload(row, await planFor(row));
+  if (payload.stage === "BOOKED" && !payload.booking) {
+    const requestId = row["medical_request_id"] as string | null;
+    const itineraryId = row["itinerary_id"] as string | null;
+    if (requestId && itineraryId) {
+      const [req, itin] = await Promise.all([
+        sb.from("medical_requests").select("reference").eq("id", requestId).maybeSingle(),
+        sb.from("itineraries").select("public_token").eq("id", itineraryId).maybeSingle(),
+      ]);
+      payload.booking = {
+        reference: (req.data?.["reference"] as string) ?? "",
+        itineraryToken: (itin.data?.["public_token"] as string) ?? "",
+      };
+    }
+  }
+  return payload;
 }
 
 export async function handleVisitorMessage(token: string | null, text: string): Promise<ChatSessionPayload> {
