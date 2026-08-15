@@ -324,6 +324,30 @@ export const api = {
       },
     }),
 
+  confirmItineraryByToken: (token: string) =>
+    request<{ ok: true }>(`/api/public/itinerary/${token}/confirm`, {
+      method: "POST",
+      mock: () => {
+        const s = db();
+        const itinerary = s.itineraries.find((i) => i.token === token);
+        if (!itinerary) throw new ApiError("Itinerary not found", 404);
+        const inquiry = s.inquiries.find((i) => i.id === itinerary.inquiryId)!;
+        s.setItineraryStatus(inquiry.id, "PATIENT_CONFIRMED");
+        s.setInquiryStatus(inquiry.id, "CONFIRMED_BOOKING");
+        s.addMessage({
+          patientId: inquiry.patientId,
+          inquiryId: inquiry.id,
+          channel: inquiry.channel,
+          author: "PATIENT",
+          body: "I confirm this itinerary. See you in Batam!",
+          sent: true,
+        });
+        s.pushFeed("Patient confirmed the itinerary", "SUCCESS", inquiry.id);
+        return { ok: true } as const;
+      },
+    }),
+
+
   humanTakeover: (inquiryId: string, body: { action: "TAKE_OVER" | "ASSIGN" | "RETURN_TO_AI" | "CLOSE"; staff?: string }) =>
     request<{ ok: true }>(`/api/inquiries/${inquiryId}/human-takeover`, {
       method: "POST",
