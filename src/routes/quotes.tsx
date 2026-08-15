@@ -31,8 +31,8 @@ export const Route = createFileRoute("/quotes")({
 });
 
 const quoteStatusMeta = {
-  AI_ESTIMATE: { label: "AI estimate", tone: "info" },
-  HOSPITAL_ADJUSTED: { label: "Hospital adjusted", tone: "warning" },
+  DRAFT: { label: "AI estimate", tone: "info" },
+  PENDING_DOCTOR: { label: "Pending doctor", tone: "warning" },
   APPROVED: { label: "Approved", tone: "batam" },
   SENT_TO_PATIENT: { label: "Sent to patient", tone: "success" },
   REJECTED: { label: "Rejected", tone: "danger" },
